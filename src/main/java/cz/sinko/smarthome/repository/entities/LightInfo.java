@@ -1,6 +1,7 @@
 package cz.sinko.smarthome.repository.entities;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import javax.validation.constraints.NotNull;
 import cz.sinko.smarthome.repository.entities.enums.State;
 import lombok.Data;
 
+//TODO: split light info and light bulb, save bulb power consuption for proper saving calculations
 @Data
 @Entity(name = "lights_info")
 public class LightInfo implements Serializable {
@@ -31,6 +33,7 @@ public class LightInfo implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private State oldState;
 
+	@NotNull
 	@Column(name = "new_state")
 	@Enumerated(EnumType.STRING)
 	private State newState;
@@ -39,9 +42,13 @@ public class LightInfo implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private State oldReachableState;
 
+	@NotNull
 	@Column(name = "new_reachable_state")
 	@Enumerated(EnumType.STRING)
 	private State newReachableState;
+
+	@Column(name = "duration_of_lighting")
+	private Duration durationOfLighting;
 
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)

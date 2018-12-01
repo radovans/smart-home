@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import cz.sinko.smarthome.repository.daos.SunInfoDao;
 import cz.sinko.smarthome.repository.daos.WeatherInfoDao;
+import cz.sinko.smarthome.repository.entities.SunInfo;
 import cz.sinko.smarthome.repository.entities.WeatherInfo;
 import cz.sinko.smarthome.service.dtos.inputs.WeatherInputDto;
 
@@ -29,21 +31,35 @@ public class WeatherInfoProvider {
 	@Autowired
 	private WeatherInfoDao weatherInfoDao;
 
-	//TODO: save temperature and sun info separately, check sun info just once in 24 hours
+	@Autowired
+	private SunInfoDao sunInfoDao;
+
+//	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
+//	public void checkSunInfo() {
+//		if (sunInfoDao.findByDate(new Date()) == null) {
+//			logger.debug("Checking sun info");
+//			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
+//			logger.debug(weatherInputDto.toString());
+//			SunInfo sunInfo = new SunInfo();
+//			sunInfo.setSunrise(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunrise()))));
+//			sunInfo.setSunset(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunset()))));
+//			sunInfo.setDate(new Date());
+//			sunInfoDao.save(sunInfo);
+//		}
+//	}
+
 	@Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 5000)
 	public void checkWeatherInfo() {
-		logger.info("Checking weather info");
-		WeatherInputDto weatherInputDto = getWeatherInfo();
-		logger.info(weatherInputDto.toString());
+		logger.debug("Checking weather info");
+		WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
+		logger.debug(weatherInputDto.toString());
 		WeatherInfo weatherInfo = new WeatherInfo();
 		weatherInfo.setTemperature(Float.parseFloat(weatherInputDto.getTemperature().getTemperature()));
-		weatherInfo.setSunrise(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunrise()))));
-		weatherInfo.setSunset(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunset()))));
 		weatherInfo.setTimestamp(new Date());
 		weatherInfoDao.save(weatherInfo);
 	}
 
-	private WeatherInputDto getWeatherInfo() {
+	private WeatherInputDto getWeatherAndSunInfo() {
 		final String uri = "http://" + URL + "?id=" + BRNO_ID + "&units=" + UNITS + "&APPID=" + APIKEY;
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(uri, WeatherInputDto.class);

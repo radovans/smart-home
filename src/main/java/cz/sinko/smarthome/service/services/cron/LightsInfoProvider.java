@@ -1,5 +1,6 @@
 package cz.sinko.smarthome.service.services.cron;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
 
@@ -30,29 +31,66 @@ public class LightsInfoProvider {
 	//TODO: optimize, clean, add mappers, for cycle and check each light separately
 	@Scheduled(fixedRate = 10 * 1000, initialDelay = 5000)
 	public void checkLightsState() {
-		logger.info("Checking lights states");
+		logger.debug("Checking lights states");
 		LightInfoListInputDto lightsInfo = getLightsInfo();
-		logger.info(lightsInfo.toString());
+		logger.debug(lightsInfo.toString());
 
 		State oldState = null, newState, oldReachableState = null, newReachableState;
+		Date lastChange = null;
+		Date now = new Date();
+		Duration durationOfLighting = null;
 
-		Optional<LightInfo> lastLightInfo = lightInfoDao.findFirstByLightIdOrderByTimestampDesc(lightsInfo.getLightInfoInputDto1().getUniqueId());
+		Optional<LightInfo> lastLightInfo =
+				lightInfoDao.findFirstByLightIdOrderByTimestampDesc(lightsInfo.getLightInfoInputDto1().getUniqueId());
 		if (lastLightInfo.isPresent()) {
 			oldState = lastLightInfo.get().getNewState();
 			oldReachableState = lastLightInfo.get().getNewReachableState();
+			lastChange = lastLightInfo.get().getTimestamp();
 		}
 
+		newState = determineNewState(lightsInfo);
+		newReachableState = determineNewReachableState(lightsInfo);
+		durationOfLighting = computeDurationOfLighting(oldState, newState, oldReachableState, newReachableState,
+				lastChange, now);
+		createNewLightInfo(lightsInfo, oldState, newState, oldReachableState, newReachableState, durationOfLighting, now);
+	}
+
+	//TODO: compute properly while reachable is OFF
+	private Duration computeDurationOfLighting(State oldState, State newState, State oldReachableState,
+			State newReachableState, Date lastChange, Date now) {
+		if (lastChange != null) {
+			if (oldState.equals(State.ON)
+					&& newState.equals(State.OFF)
+					&& oldReachableState.equals(State.ON)
+					&& newReachableState.equals(State.ON)) {
+				return Duration.between(lastChange.toInstant(), now.toInstant());
+			}
+		}
+		return null;
+	}
+
+	private State determineNewState(LightInfoListInputDto lightsInfo) {
+		State newState;
 		if (lightsInfo.getLightInfoInputDto1().getLightInfoStateInputDto().isOn()) {
 			newState = State.ON;
 		} else {
 			newState = State.OFF;
 		}
+		return newState;
+	}
+
+	private State determineNewReachableState(LightInfoListInputDto lightsInfo) {
+		State newReachableState;
 		if (lightsInfo.getLightInfoInputDto1().getLightInfoStateInputDto().isReachable()) {
 			newReachableState = State.ON;
 		} else {
 			newReachableState = State.OFF;
 		}
+		return newReachableState;
+	}
 
+	private void createNewLightInfo(LightInfoListInputDto lightsInfo, State oldState, State newState,
+			State oldReachableState, State newReachableState, Duration durationOfLighting, Date now) {
 		if (oldState != newState || oldReachableState != newReachableState) {
 			LightInfo lightInfo = new LightInfo();
 			lightInfo.setLightId(lightsInfo.getLightInfoInputDto1().getUniqueId());
@@ -60,7 +98,8 @@ public class LightsInfoProvider {
 			lightInfo.setOldReachableState(oldReachableState);
 			lightInfo.setNewState(newState);
 			lightInfo.setNewReachableState(newReachableState);
-			lightInfo.setTimestamp(new Date());
+			lightInfo.setDurationOfLighting(durationOfLighting);
+			lightInfo.setTimestamp(now);
 			lightInfoDao.save(lightInfo);
 		}
 	}
@@ -68,7 +107,7 @@ public class LightsInfoProvider {
 	private LightInfoListInputDto getLightsInfo() {
 		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights";
 		RestTemplate restTemplate = new RestTemplate();
-		logger.info(restTemplate.getForObject(uri, String.class));
+		logger.debug(restTemplate.getForObject(uri, String.class));
 		return restTemplate.getForObject(uri, LightInfoListInputDto.class);
 	}
 
