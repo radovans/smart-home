@@ -1,5 +1,6 @@
 package cz.sinko.smarthome.service;
 
+import cz.sinko.smarthome.service.dto.lighting.LightDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -25,10 +26,10 @@ public class LightingServiceImpl implements LightingService {
 		return result;
 	}
 
-	@Override public String getLightById(long id) {
+	@Override public LightDto getLightById(long id) {
 		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + id;
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject(uri, String.class);
+		LightDto result = restTemplate.getForObject(uri, LightDto.class);
 		return result;
 	}
 

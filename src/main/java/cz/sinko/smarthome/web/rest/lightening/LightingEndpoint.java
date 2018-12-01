@@ -1,6 +1,7 @@
 package cz.sinko.smarthome.web.rest.lightening;
 
-import cz.sinko.smarthome.service.LightingService;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import cz.sinko.smarthome.service.LightingService;
+import cz.sinko.smarthome.service.dto.lighting.LightDto;
 
 @RestController
 @Validated
@@ -37,7 +38,7 @@ public class LightingEndpoint {
 
 	@GetMapping(path = "/lights/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public String getLightById(@NotNull @PathVariable("id") long id) {
+	public LightDto getLightById(@NotNull @PathVariable("id") long id) {
 		return lightingService.getLightById(id);
 	}
 
