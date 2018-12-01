@@ -1,17 +1,17 @@
 package cz.sinko.smarthome.service.dtos.lighting;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * @author radovan.sinko@direct.cz
- */
 @Data
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LightDto {
 
 	@ApiModelProperty(value = "Details the state of the light, see the state table below for more details.")
+	@JsonProperty("state")
 	private LightStateDto lightStateDto;
 
 	@ApiModelProperty(value = "A fixed name describing the type of light e.g. “Extended color light”.")
@@ -23,7 +23,8 @@ public class LightDto {
 	@ApiModelProperty(value = "The hardware model of the light.")
 	private String modelId;
 
-	@ApiModelProperty(value = "Unique id of the device. The MAC address of the device with a unique endpoint id in the form: AA:BB:CC:DD:EE:FF:00:11-XX")
+	@ApiModelProperty(value = "Unique id of the device. The MAC address of the device with a unique endpoint id in the"
+			+ " form: AA:BB:CC:DD:EE:FF:00:11-XX")
 	private String uniqueId;
 
 	@ApiModelProperty(value = "The manufacturer name.")
@@ -32,7 +33,11 @@ public class LightDto {
 	@ApiModelProperty(value = "Product name of devices")
 	private String productName;
 
-	@ApiModelProperty(value = "Unique ID of the luminaire the light is a part of in the format: AA:BB:CC:DD-XX-YY.  AA:BB:, ... represents the hex of the luminaireid, XX the lightsource position (incremental but may contain gaps) and YY the lightpoint position (index of light in luminaire group).  A gap in the lightpoint position indicates an incomplete luminaire (light search required to discover missing light points in this case).")
+	@ApiModelProperty(value = "Unique ID of the luminaire the light is a part of in the format: AA:BB:CC:DD-XX-YY.  "
+			+ "AA:BB:, ... represents the hex of the luminaireid, XX the lightsource position (incremental but may "
+			+ "contain gaps) and YY the lightpoint position (index of light in luminaire group).  A gap in the "
+			+ "lightpoint position indicates an incomplete luminaire (light search required to discover missing light "
+			+ "points in this case).")
 	private String luminaireUniqueId;
 
 	@ApiModelProperty(value = "Current light supports streaming features")

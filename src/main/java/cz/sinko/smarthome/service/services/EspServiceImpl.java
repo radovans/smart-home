@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cz.sinko.smarthome.config.mapper.OrikaBeanMapper;
 import cz.sinko.smarthome.repository.daos.RoomInfoDao;
-import cz.sinko.smarthome.repository.entities.esp.RoomInfo;
+import cz.sinko.smarthome.repository.entities.RoomInfo;
 import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 
 @Service

@@ -5,9 +5,6 @@ import java.util.List;
 
 import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 
-/**
- * @author radovan.sinko@direct.cz
- */
 public interface EspService {
 
 	List<RoomInfoDto> getRoomInfoByDate(long sensorId, Date date);

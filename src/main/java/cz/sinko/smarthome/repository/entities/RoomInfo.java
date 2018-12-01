@@ -1,5 +1,6 @@
-package cz.sinko.smarthome.repository.entities.esp;
+package cz.sinko.smarthome.repository.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -9,13 +10,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-@Entity(name = "room_infos")
-public class RoomInfo {
+@Entity(name = "rooms_info")
+public class RoomInfo implements Serializable {
 
 	@Id
 	@GeneratedValue

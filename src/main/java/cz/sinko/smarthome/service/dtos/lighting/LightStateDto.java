@@ -6,11 +6,10 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author radovan.sinko@direct.cz
- */
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LightStateDto {
 
 	@ApiModelProperty(value = "On/Off state of the light. On=true, Off=false")
