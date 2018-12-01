@@ -8,7 +8,8 @@ public interface LightingService {
 
 	String getLightsInfo();
 
-	LightDto getLightById(long id);
+//	LightDto getLightById(long id);
+//
+//	void changeLightByIdState(long id);
 
-	void changeLightByIdState(long id);
 }

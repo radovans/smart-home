@@ -1,10 +1,13 @@
 package cz.sinko.smarthome.repository.daos;
 
-import cz.sinko.smarthome.repository.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserDao extends JpaRepository<User, Long>{
-    
-    User findByUsername(String username);
-    
+import cz.sinko.smarthome.repository.entities.User;
+
+@Repository
+public interface UserDao extends JpaRepository<User, Long> {
+
+	User findByUsername(String username);
+
 }

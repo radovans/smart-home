@@ -1,4 +1,4 @@
-package cz.sinko.smarthome.web.rest;
+package cz.sinko.smarthome.web.rest.endpoints;
 
 import cz.sinko.smarthome.service.services.UserService;
 import javax.validation.constraints.NotNull;

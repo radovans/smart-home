@@ -8,16 +8,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * @author radovan.sinko@direct.cz
- */
 @Data
 @AllArgsConstructor
-public class TemperatureDto {
+public class RoomInfoDto {
 
-	@ApiModelProperty(value = "TemperatureDto")
+	@ApiModelProperty(value = "Humidity")
 	@NotNull
 	private float humidity;
+
+	@ApiModelProperty(value = "Temperature")
+	@NotNull
+	private float temperature;
 
 	@ApiModelProperty(value = "Timestamp")
 	@NotNull

@@ -36,16 +36,16 @@ public class LightingEndpoint {
 		return lightingService.getLightsInfo();
 	}
 
-	@GetMapping(path = "/lights/{id}")
-	@ResponseStatus(HttpStatus.OK)
-	public LightDto getLightById(@NotNull @PathVariable("id") long id) {
-		return lightingService.getLightById(id);
-	}
-
-	@PutMapping(path = "/lights/{id}/state")
-	@ResponseStatus(HttpStatus.OK)
-	public void changeLightByIdState(@NotNull @PathVariable("id") long id) {
-		lightingService.changeLightByIdState(id);
-	}
+//	@GetMapping(path = "/lights/{id}")
+//	@ResponseStatus(HttpStatus.OK)
+//	public LightDto getLightById(@NotNull @PathVariable("id") long id) {
+//		return lightingService.getLightById(id);
+//	}
+//
+//	@PutMapping(path = "/lights/{id}/state")
+//	@ResponseStatus(HttpStatus.OK)
+//	public void changeLightByIdState(@NotNull @PathVariable("id") long id) {
+//		lightingService.changeLightByIdState(id);
+//	}
 
 }

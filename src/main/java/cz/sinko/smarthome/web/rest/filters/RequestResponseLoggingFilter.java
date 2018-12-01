@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * @author radovan.sinko@direct.cz
- */
 @Component
 @Order(2)
 public class RequestResponseLoggingFilter implements Filter {
@@ -32,9 +29,9 @@ public class RequestResponseLoggingFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		logger.info("Logging Request  {} : {}", req.getMethod(), req.getRequestURI());
+		logger.info("Logging Request  {} : {} : {}", req.getMethod(), req.getRequestURI(), req.getInputStream());
 		chain.doFilter(request, response);
-		logger.info("Logging Response :{}", res.getContentType());
+		logger.info("Logging Response :{}", res.getOutputStream());
 	}
 
 	@Override public void destroy() {

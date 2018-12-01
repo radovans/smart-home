@@ -42,7 +42,7 @@ public class LightStateDto {
 	@ApiModelProperty(value = "The dynamic effect of the light, can either be “none” or “colorloop”. If set to colorloop, the light will cycle through all hues using the current brightness and saturation settings.")
 	private String effect;
 
-	@ApiModelProperty(value = "Indicates the color mode in which the light is working, this is the last command type it received. Values are “hs” for Hue and Saturation, “xy” for XY and “ct” for Color TemperatureDto. This parameter is only present when the light supports at least one of the values.")
+	@ApiModelProperty(value = "Indicates the color mode in which the light is working, this is the last command type it received. Values are “hs” for Hue and Saturation, “xy” for XY and “ct” for Color RoomInfoDto. This parameter is only present when the light supports at least one of the values.")
 	private String colormode;
 
 	@ApiModelProperty(value = "Indicates if a light can be reached by the bridge.")

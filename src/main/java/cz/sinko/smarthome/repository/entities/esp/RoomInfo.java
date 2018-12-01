@@ -1,6 +1,5 @@
 package cz.sinko.smarthome.repository.entities.esp;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -13,23 +12,25 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * @author radovan.sinko@direct.cz
- */
 @Data
 @AllArgsConstructor
-@Entity(name = "humidities")
-public class Humidity implements Serializable{
+@Entity(name = "room_infos")
+public class RoomInfo {
 
-		@Id
-		@GeneratedValue
-		private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-		@NotNull
-		private float temperature;
+	@NotNull
+	private long sensorId;
 
-		@NotNull
-		@Temporal(TemporalType.TIMESTAMP)
-		private Date timestamp;
+	@NotNull
+	private float humidity;
 
+	@NotNull
+	private float temperature;
+
+	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date timestamp;
 }

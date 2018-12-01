@@ -26,19 +26,19 @@ public class LightingServiceImpl implements LightingService {
 		return result;
 	}
 
-	@Override public LightDto getLightById(long id) {
-		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + id;
-		RestTemplate restTemplate = new RestTemplate();
-		LightDto result = restTemplate.getForObject(uri, LightDto.class);
-		return result;
-	}
-
-	@Override public void changeLightByIdState(long id) {
-		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + id + "/state";
-		RestTemplate restTemplate = new RestTemplate();
-		String turnOn = "{on:true}";
-		String turnOff = "{on:false}";
-		restTemplate.put(uri, turnOff);
-	}
+//	@Override public LightDto getLightById(long id) {
+//		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + id;
+//		RestTemplate restTemplate = new RestTemplate();
+//		LightDto result = restTemplate.getForObject(uri, LightDto.class);
+//		return result;
+//	}
+//
+//	@Override public void changeLightByIdState(long id) {
+//		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + id + "/state";
+//		RestTemplate restTemplate = new RestTemplate();
+//		String turnOn = "{on:true}";
+//		String turnOff = "{on:false}";
+//		restTemplate.put(uri, turnOff);
+//	}
 
 }
