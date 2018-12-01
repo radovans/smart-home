@@ -1,7 +1,7 @@
 package cz.sinko.smarthome.config.security;
 
-import cz.sinko.smarthome.repository.dao.UserDao;
-import cz.sinko.smarthome.repository.entity.User;
+import cz.sinko.smarthome.repository.daos.UserDao;
+import cz.sinko.smarthome.repository.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

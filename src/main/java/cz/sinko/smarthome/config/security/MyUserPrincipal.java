@@ -1,6 +1,6 @@
 package cz.sinko.smarthome.config.security;
 
-import cz.sinko.smarthome.repository.entity.User;
+import cz.sinko.smarthome.repository.entities.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -1,8 +1,8 @@
 package cz.sinko.smarthome.config.mapper;
 
-import cz.sinko.smarthome.repository.entity.User;
-import cz.sinko.smarthome.service.dto.UserCreateUpdateDto;
-import cz.sinko.smarthome.service.dto.UserDto;
+import cz.sinko.smarthome.repository.entities.User;
+import cz.sinko.smarthome.service.dtos.UserCreateUpdateDto;
+import cz.sinko.smarthome.service.dtos.UserDto;
 import java.util.Map;
 
 import ma.glasnost.orika.Mapper;

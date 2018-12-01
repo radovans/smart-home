@@ -1,6 +1,6 @@
 package cz.sinko.smarthome.web.rest;
 
-import cz.sinko.smarthome.service.UserService;
+import cz.sinko.smarthome.service.services.UserService;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
