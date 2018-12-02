@@ -1,7 +1,8 @@
 package cz.sinko.smarthome.service.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +25,12 @@ public class EspServiceImpl implements EspService {
 	@Autowired
 	private OrikaBeanMapper mapper;
 
-	@Override public List<RoomInfoDto> getRoomInfoByDate(long sensorId, Date date) {
+	@Override public List<RoomInfoDto> getRoomInfoByDate(long sensorId, LocalDate date) {
 		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestamp(sensorId, date);
 		return new ArrayList<>(roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList()));
 	}
 
-	@Override public List<RoomInfoDto> getRoomInfoFromDateTime(long sensorId, Date date) {
+	@Override public List<RoomInfoDto> getRoomInfoFromDateTime(long sensorId, LocalDateTime date) {
 		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestampAfter(sensorId, date);
 		return new ArrayList<>(roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList()));
 	}

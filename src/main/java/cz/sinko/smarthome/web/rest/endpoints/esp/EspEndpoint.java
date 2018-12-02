@@ -1,9 +1,8 @@
 package cz.sinko.smarthome.web.rest.endpoints.esp;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-
-import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,14 +28,14 @@ public class EspEndpoint {
 
 	@GetMapping(path = "/{sensorId}")
 	@ResponseStatus(HttpStatus.OK)
-	public List<RoomInfoDto> getRoomInfoByDate(@PathVariable long sensorId, @RequestParam("date") Date date, @RequestParam("from") Date fromDateTime) {
+	public List<RoomInfoDto> getRoomInfoByDate(@PathVariable long sensorId, @RequestParam("date") LocalDate date, @RequestParam("from") LocalDateTime fromDateTime) {
 		if (date != null) {
 			return espService.getRoomInfoByDate(sensorId, date);
 		}
 		if (fromDateTime != null) {
 			return espService.getRoomInfoFromDateTime(sensorId, fromDateTime);
 		}
-		return espService.getRoomInfoByDate(sensorId, new Date());
+		return espService.getRoomInfoByDate(sensorId, LocalDate.now());
 	}
 
 }

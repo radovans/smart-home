@@ -1,6 +1,6 @@
 package cz.sinko.smarthome.service.dtos.esp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 
@@ -22,5 +22,5 @@ public class RoomInfoDto {
 
 	@ApiModelProperty(value = "Timestamp")
 	@NotNull
-	private Date timestamp;
+	private LocalDateTime timestamp;
 }

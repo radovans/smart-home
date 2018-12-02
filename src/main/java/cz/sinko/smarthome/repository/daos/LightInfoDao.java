@@ -1,6 +1,7 @@
 package cz.sinko.smarthome.repository.daos;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,16 @@ public interface LightInfoDao extends JpaRepository<LightInfo, Long> {
 
 	Optional<LightInfo> findFirstByLightIdOrderByTimestampDesc(String lightId);
 
-	List<LightInfo> findAllByTimestamp(Date date);
+	default List<LightInfo> findAllByDate(LocalDate date) {
+		return findAllByTimestampBetween(date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+	}
+
+	List<LightInfo> findAllByTimestampBetween(LocalDateTime from, LocalDateTime to);
+
+	default List<LightInfo> findAllByDateWithLightingDuration(LocalDate date) {
+		return findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+	}
+
+	List<LightInfo> findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(LocalDateTime from, LocalDateTime to);
 
 }

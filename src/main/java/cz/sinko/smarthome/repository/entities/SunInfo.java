@@ -1,14 +1,13 @@
 package cz.sinko.smarthome.repository.entities;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -22,16 +21,13 @@ public class SunInfo implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date sunrise;
+	private LocalTime sunrise;
 
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date sunset;
+	private LocalTime sunset;
 
+	@NotNull
 	@Column(unique = true)
-	@NotNull
-	@Temporal(TemporalType.DATE)
-	private Date date;
+	private LocalDate date;
 
 }

@@ -5,7 +5,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,17 @@ public class LightingCalculationsServiceImpl implements LightingCalculationsServ
 	@Autowired
 	private LightInfoDao lightInfoDao;
 
+	//TODO: cover edge cases, when light is turned on during midnight
 	@Override
-	public Duration getLightingDurationByDate(Date date) {
-		List<LightInfo> allLightsInfoByDate = lightInfoDao.findAllByTimestamp(date);
+	public Duration getLightingDurationByDate(LocalDate date) {
+		List<LightInfo> allLightsInfoByDate = lightInfoDao.findAllByDateWithLightingDuration(date);
 		long durationOfLightingInSeconds =
-				allLightsInfoByDate.stream().mapToLong(lightInfo -> lightInfo.getDurationOfLighting().getSeconds()).sum();
+				allLightsInfoByDate.stream().mapToLong(lightInfo -> lightInfo.getDurationOfLightingInSeconds()).sum();
 		return Duration.of(durationOfLightingInSeconds, SECONDS);
 	}
 
 	@Override
-	public BigDecimal getPowerSavingsByDate(Date date) {
+	public BigDecimal getPowerSavingsByDate(LocalDate date) {
 		Duration lightingDuration = getLightingDurationByDate(date);
 		BigDecimal ledConsumption =
 				LED_BULB_POWER_CONSUMPTION_IN_WATTS.multiply(new BigDecimal(lightingDuration.toMinutes()).divide(new BigDecimal(60)));

@@ -1,7 +1,12 @@
 package cz.sinko.smarthome.service.services.cron;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +39,26 @@ public class WeatherInfoProvider {
 	@Autowired
 	private SunInfoDao sunInfoDao;
 
-//	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
-//	public void checkSunInfo() {
-//		if (sunInfoDao.findByDate(new Date()) == null) {
-//			logger.debug("Checking sun info");
-//			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
-//			logger.debug(weatherInputDto.toString());
-//			SunInfo sunInfo = new SunInfo();
-//			sunInfo.setSunrise(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunrise()))));
-//			sunInfo.setSunset(Date.from(Instant.ofEpochSecond(Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunset()))));
-//			sunInfo.setDate(new Date());
-//			sunInfoDao.save(sunInfo);
-//		}
-//	}
+	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
+	public void checkSunInfo() {
+		LocalDate today = LocalDate.now();
+		if (sunInfoDao.findByDate(today) == null) {
+			logger.debug("Checking sun info");
+			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
+			logger.debug(weatherInputDto.toString());
+			SunInfo sunInfo = new SunInfo();
+			sunInfo.setSunrise(LocalTime.from(LocalDateTime.ofInstant(
+					Instant.ofEpochSecond(
+							Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunrise())),
+					TimeZone.getDefault().toZoneId())));
+			sunInfo.setSunset(LocalTime.from(LocalDateTime.ofInstant(
+					Instant.ofEpochSecond(
+							Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunset())),
+					TimeZone.getDefault().toZoneId())));
+			sunInfo.setDate(today);
+			sunInfoDao.save(sunInfo);
+		}
+	}
 
 	@Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 5000)
 	public void checkWeatherInfo() {
@@ -54,8 +66,8 @@ public class WeatherInfoProvider {
 		WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 		logger.debug(weatherInputDto.toString());
 		WeatherInfo weatherInfo = new WeatherInfo();
-		weatherInfo.setTemperature(Float.parseFloat(weatherInputDto.getTemperature().getTemperature()));
-		weatherInfo.setTimestamp(new Date());
+		weatherInfo.setTemperature(BigDecimal.valueOf(Double.parseDouble(weatherInputDto.getTemperature().getTemperature())).setScale(2, RoundingMode.HALF_UP));
+		weatherInfo.setTimestamp(LocalDateTime.now());
 		weatherInfoDao.save(weatherInfo);
 	}
 

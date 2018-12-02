@@ -1,7 +1,7 @@
 package cz.sinko.smarthome.service.services.cron;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -36,8 +36,8 @@ public class LightsInfoProvider {
 		logger.debug(lightsInfo.toString());
 
 		State oldState = null, newState, oldReachableState = null, newReachableState;
-		Date lastChange = null;
-		Date now = new Date();
+		LocalDateTime lastChange = null;
+		LocalDateTime now = LocalDateTime.now();
 		Duration durationOfLighting = null;
 
 		Optional<LightInfo> lastLightInfo =
@@ -52,18 +52,19 @@ public class LightsInfoProvider {
 		newReachableState = determineNewReachableState(lightsInfo);
 		durationOfLighting = computeDurationOfLighting(oldState, newState, oldReachableState, newReachableState,
 				lastChange, now);
-		createNewLightInfo(lightsInfo, oldState, newState, oldReachableState, newReachableState, durationOfLighting, now);
+		createNewLightInfo(lightsInfo, oldState, newState, oldReachableState, newReachableState, durationOfLighting,
+				now);
 	}
 
 	//TODO: compute properly while reachable is OFF
 	private Duration computeDurationOfLighting(State oldState, State newState, State oldReachableState,
-			State newReachableState, Date lastChange, Date now) {
+			State newReachableState, LocalDateTime lastChange, LocalDateTime now) {
 		if (lastChange != null) {
 			if (oldState.equals(State.ON)
 					&& newState.equals(State.OFF)
 					&& oldReachableState.equals(State.ON)
 					&& newReachableState.equals(State.ON)) {
-				return Duration.between(lastChange.toInstant(), now.toInstant());
+				return Duration.between(lastChange, now);
 			}
 		}
 		return null;
@@ -90,7 +91,7 @@ public class LightsInfoProvider {
 	}
 
 	private void createNewLightInfo(LightInfoListInputDto lightsInfo, State oldState, State newState,
-			State oldReachableState, State newReachableState, Duration durationOfLighting, Date now) {
+			State oldReachableState, State newReachableState, Duration durationOfLighting, LocalDateTime now) {
 		if (oldState != newState || oldReachableState != newReachableState) {
 			LightInfo lightInfo = new LightInfo();
 			lightInfo.setLightId(lightsInfo.getLightInfoInputDto1().getUniqueId());
@@ -98,7 +99,7 @@ public class LightsInfoProvider {
 			lightInfo.setOldReachableState(oldReachableState);
 			lightInfo.setNewState(newState);
 			lightInfo.setNewReachableState(newReachableState);
-			lightInfo.setDurationOfLighting(durationOfLighting);
+			lightInfo.setDurationOfLightingInSeconds(durationOfLighting == null ? null : durationOfLighting.getSeconds());
 			lightInfo.setTimestamp(now);
 			lightInfoDao.save(lightInfo);
 		}

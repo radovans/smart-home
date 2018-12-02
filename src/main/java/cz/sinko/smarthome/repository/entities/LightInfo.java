@@ -2,7 +2,7 @@ package cz.sinko.smarthome.repository.entities;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,8 +10,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import cz.sinko.smarthome.repository.entities.enums.State;
@@ -48,10 +46,9 @@ public class LightInfo implements Serializable {
 	private State newReachableState;
 
 	@Column(name = "duration_of_lighting")
-	private Duration durationOfLighting;
+	private Long durationOfLightingInSeconds;
 
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date timestamp;
+	private LocalDateTime timestamp;
 
 }

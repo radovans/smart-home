@@ -2,12 +2,12 @@ package cz.sinko.smarthome.service.services;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
 
 public interface LightingCalculationsService {
 
-	Duration getLightingDurationByDate(Date date);
+	Duration getLightingDurationByDate(LocalDate date);
 
-	BigDecimal getPowerSavingsByDate(Date date);
+	BigDecimal getPowerSavingsByDate(LocalDate date);
 
 }

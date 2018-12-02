@@ -1,6 +1,6 @@
 package cz.sinko.smarthome.service.services;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class WeatherServiceImpl implements WeatherService {
 	@Autowired
 	private SunInfoDao sunInfoDao;
 
-	@Override public SunInfo getSunInfoByDate(Date date) {
+	@Override public SunInfo getSunInfoByDate(LocalDate date) {
 		return sunInfoDao.findByDate(date);
 	}
 

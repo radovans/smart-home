@@ -2,6 +2,7 @@ package cz.sinko.smarthome.web.rest.endpoints.lightening;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -47,13 +48,13 @@ public class LightingEndpoint {
 	@GetMapping(path = "/powerSavings")
 	@ResponseStatus(HttpStatus.OK)
 	public BigDecimal getPowerSavingsByDate() {
-		return lightingCalculationsService.getPowerSavingsByDate(new Date(2018, 12, 2));
+		return lightingCalculationsService.getPowerSavingsByDate(LocalDate.now());
 	}
 
 	@GetMapping(path = "/lightingDuration")
 	@ResponseStatus(HttpStatus.OK)
 	public Duration getLightingDurationByDate() {
-		return lightingCalculationsService.getLightingDurationByDate(new Date(2018, 12, 2));
+		return lightingCalculationsService.getLightingDurationByDate(LocalDate.now());
 	}
 
 	//	@GetMapping(path = "/lights/{id}")
