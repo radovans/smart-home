@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cz.sinko.smarthome.repository.daos.LightInfoDao;
 import cz.sinko.smarthome.repository.entities.LightInfo;
 
+//TODO: calculate lightings duration while sun is up
 @Service
 @Transactional
 public class LightingCalculationsServiceImpl implements LightingCalculationsService {

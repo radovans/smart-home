@@ -8,11 +8,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,9 +19,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import cz.sinko.smarthome.repository.daos.LightInfoDao;
 import cz.sinko.smarthome.repository.entities.LightInfo;
-import cz.sinko.smarthome.repository.entities.enums.State;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class LightingCalculationsServiceImplTest {
 
 	@Mock
@@ -58,6 +54,7 @@ public class LightingCalculationsServiceImplTest {
 		lightInfos.add(lightInfo);
 
 		when(lightInfoDao.findAllByDateWithLightingDuration(Mockito.any())).thenReturn(lightInfos);
-		assertEquals(Duration.of(1, HOURS), lightingCalculationsServiceImpl.getLightingDurationByDate(LocalDate.of(2018, 1, 1)));
+		assertEquals(Duration.of(1, HOURS),
+				lightingCalculationsServiceImpl.getLightingDurationByDate(LocalDate.of(2018, 1, 1)));
 	}
 }

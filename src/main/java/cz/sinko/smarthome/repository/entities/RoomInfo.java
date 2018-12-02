@@ -20,7 +20,7 @@ public class RoomInfo implements Serializable {
 	private Long id;
 
 	@NotNull
-	private long sensorId;
+	private String sensorId;
 
 	@NotNull
 	private BigDecimal humidity;
