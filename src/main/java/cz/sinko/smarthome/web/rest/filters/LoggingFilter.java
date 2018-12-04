@@ -1,0 +1,120 @@
+package cz.sinko.smarthome.web.rest.filters;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+@Component
+@Order(2)
+public class LoggingFilter extends OncePerRequestFilter {
+
+	protected static final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
+	private static final String REQUEST_PREFIX = "Request: ";
+	private static final String RESPONSE_PREFIX = "Response: ";
+	private AtomicLong requestNumber = new AtomicLong(0);
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+			final FilterChain filterChain)
+			throws ServletException, IOException {
+		if (logger.isDebugEnabled()) {
+			long requestNumber = this.requestNumber.incrementAndGet();
+			request = new RequestWrapper(requestNumber, request);
+			response = new ResponseWrapper(requestNumber, response);
+		}
+		try {
+			filterChain.doFilter(request, response);
+		} finally {
+			if (logger.isDebugEnabled()) {
+				logRequest(request);
+				logResponse((ResponseWrapper) response);
+			}
+		}
+	}
+
+	private void logRequest(final HttpServletRequest request) {
+		StringBuilder msg = new StringBuilder();
+		msg.append(REQUEST_PREFIX);
+		if (request instanceof RequestWrapper) {
+			msg.append("requestNumber=").append(((RequestWrapper) request).getId()).append("; ");
+		}
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			msg.append("session id=").append(session.getId()).append("; ");
+		}
+		if (request.getMethod() != null) {
+			msg.append("method=").append(request.getMethod()).append("; ");
+		}
+		if (request.getContentType() != null) {
+			msg.append("content type=").append(request.getContentType()).append("; ");
+		}
+		if (request.getHeaderNames() != null) {
+			msg.append("headers=");
+			Collections.list(request.getHeaderNames()).forEach(headerName ->
+					Collections.list(request.getHeaders(headerName)).forEach(headerValue ->
+							msg.append(headerName).append("=").append(headerValue).append(", ")));
+		}
+		msg.append("uri=").append(request.getRequestURI());
+		if (request.getQueryString() != null) {
+			msg.append('?').append(request.getQueryString());
+		}
+
+		if (request instanceof RequestWrapper && !isMultipart(request) && !isBinaryContent(request)) {
+			RequestWrapper requestWrapper = (RequestWrapper) request;
+			try {
+				String charEncoding =
+						requestWrapper.getCharacterEncoding() != null ? requestWrapper.getCharacterEncoding() :
+								"UTF-8";
+				msg.append("; payload=").append(new String(requestWrapper.toByteArray(), charEncoding));
+			} catch (UnsupportedEncodingException e) {
+				logger.warn("Failed to parse request payload", e);
+			}
+
+		}
+		logger.info(msg.toString());
+	}
+
+	private boolean isBinaryContent(final HttpServletRequest request) {
+		if (request.getContentType() == null) {
+			return false;
+		}
+		return request.getContentType().startsWith("image") || request.getContentType().startsWith("video")
+				|| request.getContentType().startsWith("audio");
+	}
+
+	private boolean isMultipart(final HttpServletRequest request) {
+		return request.getContentType() != null && request.getContentType().startsWith("multipart/form-data");
+	}
+
+	private void logResponse(final ResponseWrapper response) {
+		StringBuilder msg = new StringBuilder();
+		msg.append(RESPONSE_PREFIX);
+		msg.append("requestNumber=").append(response.getRequestNumber()).append("; ");
+		if (response.getHeaderNames() != null) {
+			msg.append("headers=");
+			response.getHeaderNames()
+					.forEach(headerName ->
+							msg.append(headerName).append("=").append(response.getHeader(headerName)).append(", "));
+		}
+		try {
+			msg.append("; payload=").append(new String(response.toByteArray(), response.getCharacterEncoding()));
+		} catch (UnsupportedEncodingException e) {
+			logger.warn("Failed to parse response payload", e);
+		}
+		logger.info(msg.toString());
+	}
+
+}
