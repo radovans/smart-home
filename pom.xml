@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
 
 		<apache.commons.version>2.6</apache.commons.version>
+		<codehouse.janino.version>3.0.10</codehouse.janino.version>
 		<logback-json.version>0.1.5</logback-json.version>
 		<lombok.version>1.18.2</lombok.version>
 		<orika.version>1.5.2</orika.version>
@@ -99,6 +100,13 @@
 			<groupId>ch.qos.logback.contrib</groupId>
 			<artifactId>logback-jackson</artifactId>
 			<version>${logback-json.version}</version>
+		</dependency>
+
+		<!--Log config if condition-->
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>${codehouse.janino.version}</version>
 		</dependency>
 
 		<dependency>
