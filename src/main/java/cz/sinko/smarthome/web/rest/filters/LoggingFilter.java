@@ -17,6 +17,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+//TODO: create request and response object with selected fields and log just them, som type of pretty print
 @Component
 @Order(2)
 public class LoggingFilter extends OncePerRequestFilter {

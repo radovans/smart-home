@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +19,7 @@ import cz.sinko.smarthome.service.dtos.inputs.RoomInfoInputDto;
 
 @Service
 @Transactional
+@ConditionalOnProperty(name = "feature.toggles.cron.room.info", havingValue = "true", matchIfMissing = true)
 public class RoomInfoProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(RoomInfoProvider.class);
@@ -26,7 +29,7 @@ public class RoomInfoProvider {
 	@Autowired
 	private RoomInfoDao roomInfoDao;
 
-	//	@Scheduled(fixedRate = 60 * 1000, initialDelay = 5000)
+	@Scheduled(fixedRate = 60 * 1000, initialDelay = 5000)
 	public void checkRoomInfo() {
 		logger.debug("Checking room info");
 		RoomInfoInputDto roomInfoInputDto = getRoomInfo();

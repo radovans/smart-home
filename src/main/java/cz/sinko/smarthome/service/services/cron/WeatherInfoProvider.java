@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import cz.sinko.smarthome.service.dtos.inputs.WeatherInputDto;
 
 @Service
 @Transactional
+@ConditionalOnProperty(name = "feature.toggles.cron.weather.info", havingValue = "true", matchIfMissing = true)
 public class WeatherInfoProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(WeatherInfoProvider.class);
@@ -43,7 +45,7 @@ public class WeatherInfoProvider {
 	public void checkSunInfo() {
 		LocalDate today = LocalDate.now();
 		if (sunInfoDao.findByDate(today) == null) {
-			logger.debug("Checking sun info");
+			logger.info("Checking sun info");
 			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 			logger.debug(weatherInputDto.toString());
 			SunInfo sunInfo = new SunInfo();
@@ -62,7 +64,7 @@ public class WeatherInfoProvider {
 
 	@Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 5000)
 	public void checkWeatherInfo() {
-		logger.debug("Checking weather info");
+		logger.info("Checking weather info");
 		WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 		logger.debug(weatherInputDto.toString());
 		WeatherInfo weatherInfo = new WeatherInfo();

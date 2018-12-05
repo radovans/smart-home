@@ -5,7 +5,7 @@
 	<property resource="application.properties"/>
 
 	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-		<if condition='property("logging.output.json").contains("true")'>
+		<if condition='property("feature.toggles.logging.output.json").contains("true")'>
 			<then>
 				<layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
 				<jsonFormatter
