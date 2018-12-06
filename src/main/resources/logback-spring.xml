@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<property name="LOGS" value="./logs" />
+	<property name="LOGS" value="./logs"/>
 	<property resource="application.properties"/>
 
 	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
 		<if condition='property("feature.toggles.logging.output.json").contains("true")'>
 			<then>
-				<layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
-				<jsonFormatter
-				class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-				<prettyPrint>true</prettyPrint>
-				</jsonFormatter>
-				<timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
-				</layout>
+				<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+					<jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+					<timestampPattern>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampPattern>
+					<fieldNames>
+						<timestamp>timestamp</timestamp>
+						<levelValue>[ignore]</levelValue>
+						<logger>logger</logger>
+						<message>message</message>
+						<version>[ignore]</version>
+					</fieldNames>
+				</encoder>
 			</then>
 			<else>
 				<layout class="ch.qos.logback.classic.PatternLayout">
@@ -26,11 +30,11 @@
 	</appender>
 
 	<root level="warn">
-		<appender-ref ref="Console" />
+		<appender-ref ref="Console"/>
 	</root>
 
 	<logger name="cz.sinko.smarthome" level="debug" additivity="false">
-		<appender-ref ref="Console" />
+		<appender-ref ref="Console"/>
 	</logger>
 
 </configuration>

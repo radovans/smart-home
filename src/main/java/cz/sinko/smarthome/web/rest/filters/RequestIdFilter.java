@@ -32,10 +32,10 @@ public class RequestIdFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		try {
-			HttpServletRequest req = (HttpServletRequest) request;
-			HttpServletResponse res = (HttpServletResponse) response;
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse res = (HttpServletResponse) response;
 
+		if (!SkipLoggingAndRequestId.skip(req)) {
 			String requestId = req.getHeader(REQUEST_HEADER_NAME);
 
 			if (requestId == null || "".equals(requestId)) {
@@ -43,12 +43,15 @@ public class RequestIdFilter implements Filter {
 			}
 
 			logger.debug("RequestId: " + requestId);
-			MDC.put("requestId", requestId);
-
-			res.addHeader(REQUEST_HEADER_NAME, requestId);
+			try {
+				MDC.put("requestId", requestId);
+				res.addHeader(REQUEST_HEADER_NAME, requestId);
+				chain.doFilter(request, response);
+			} finally {
+				MDC.clear();
+			}
+		} else {
 			chain.doFilter(request, response);
-		} finally {
-			MDC.clear();
 		}
 	}
 

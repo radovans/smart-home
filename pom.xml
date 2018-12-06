@@ -26,6 +26,7 @@
 		<apache.commons.version>2.6</apache.commons.version>
 		<codehouse.janino.version>3.0.10</codehouse.janino.version>
 		<logback-json.version>0.1.5</logback-json.version>
+		<logback-encoder.version>5.2</logback-encoder.version>
 		<lombok.version>1.18.2</lombok.version>
 		<orika.version>1.5.2</orika.version>
 		<spring-fox-swagger.version>2.9.2</spring-fox-swagger.version>
@@ -104,6 +105,13 @@
 			<groupId>ch.qos.logback.contrib</groupId>
 			<artifactId>logback-jackson</artifactId>
 			<version>${logback-json.version}</version>
+		</dependency>
+
+		<!--Log objects in json format-->
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logback-encoder.version}</version>
 		</dependency>
 
 		<!--Log config if condition-->

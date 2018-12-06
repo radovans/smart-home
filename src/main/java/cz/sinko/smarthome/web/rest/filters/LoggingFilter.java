@@ -1,8 +1,12 @@
 package cz.sinko.smarthome.web.rest.filters;
 
+import static net.logstash.logback.marker.Markers.append;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.FilterChain;
@@ -17,60 +21,61 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-//TODO: create request and response object with selected fields and log just them, som type of pretty print
+import lombok.Data;
+
 @Component
 @Order(2)
 public class LoggingFilter extends OncePerRequestFilter {
 
 	protected static final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
-	private static final String REQUEST_PREFIX = "Request: ";
-	private static final String RESPONSE_PREFIX = "Response: ";
 	private AtomicLong requestNumber = new AtomicLong(0);
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			final FilterChain filterChain)
 			throws ServletException, IOException {
-		if (logger.isDebugEnabled()) {
-			long requestNumber = this.requestNumber.incrementAndGet();
-			request = new RequestWrapper(requestNumber, request);
-			response = new ResponseWrapper(requestNumber, response);
-		}
-		try {
-			filterChain.doFilter(request, response);
-		} finally {
+		if (!SkipLoggingAndRequestId.skip(request)) {
 			if (logger.isDebugEnabled()) {
-				logRequest(request);
-				logResponse((ResponseWrapper) response);
+				long requestNumber = this.requestNumber.incrementAndGet();
+				request = new RequestWrapper(requestNumber, request);
+				response = new ResponseWrapper(requestNumber, response);
 			}
+			try {
+				filterChain.doFilter(request, response);
+			} finally {
+				if (logger.isDebugEnabled()) {
+					logRequest(request);
+					logResponse((ResponseWrapper) response);
+				}
+			}
+		} else {
+			filterChain.doFilter(request, response);
 		}
 	}
 
 	private void logRequest(final HttpServletRequest request) {
-		StringBuilder msg = new StringBuilder();
-		msg.append(REQUEST_PREFIX);
+		LogRequest logRequest = new LogRequest();
 		if (request instanceof RequestWrapper) {
-			msg.append("requestNumber=").append(((RequestWrapper) request).getId()).append("; ");
+			logRequest.setRequestNumber(((RequestWrapper) request).getId());
 		}
 		HttpSession session = request.getSession(false);
 		if (session != null) {
-			msg.append("session id=").append(session.getId()).append("; ");
+			logRequest.setSessionId(session.getId());
 		}
 		if (request.getMethod() != null) {
-			msg.append("method=").append(request.getMethod()).append("; ");
+			logRequest.setMethod(request.getMethod());
 		}
 		if (request.getContentType() != null) {
-			msg.append("content type=").append(request.getContentType()).append("; ");
+			logRequest.setContentType(request.getContentType());
 		}
 		if (request.getHeaderNames() != null) {
-			msg.append("headers=");
 			Collections.list(request.getHeaderNames()).forEach(headerName ->
 					Collections.list(request.getHeaders(headerName)).forEach(headerValue ->
-							msg.append(headerName).append("=").append(headerValue).append(", ")));
+							logRequest.addHeader(headerName, headerValue)));
 		}
-		msg.append("uri=").append(request.getRequestURI());
+		logRequest.setUri(request.getRequestURI());
 		if (request.getQueryString() != null) {
-			msg.append('?').append(request.getQueryString());
+			logRequest.setUri(logRequest.getUri() + request.getQueryString());
 		}
 
 		if (request instanceof RequestWrapper && !isMultipart(request) && !isBinaryContent(request)) {
@@ -79,13 +84,13 @@ public class LoggingFilter extends OncePerRequestFilter {
 				String charEncoding =
 						requestWrapper.getCharacterEncoding() != null ? requestWrapper.getCharacterEncoding() :
 								"UTF-8";
-				msg.append("; payload=").append(new String(requestWrapper.toByteArray(), charEncoding));
+				logRequest.setPayload(new String(requestWrapper.toByteArray(), charEncoding));
 			} catch (UnsupportedEncodingException e) {
 				logger.warn("Failed to parse request payload", e);
 			}
 
 		}
-		logger.info(msg.toString());
+		logger.info(append("request", logRequest), logRequest.toString());
 	}
 
 	private boolean isBinaryContent(final HttpServletRequest request) {
@@ -101,21 +106,57 @@ public class LoggingFilter extends OncePerRequestFilter {
 	}
 
 	private void logResponse(final ResponseWrapper response) {
-		StringBuilder msg = new StringBuilder();
-		msg.append(RESPONSE_PREFIX);
-		msg.append("requestNumber=").append(response.getRequestNumber()).append("; ");
+		LogResponse logResponse = new LogResponse();
+		logResponse.setRequestNumber(response.getRequestNumber());
 		if (response.getHeaderNames() != null) {
-			msg.append("headers=");
 			response.getHeaderNames()
 					.forEach(headerName ->
-							msg.append(headerName).append("=").append(response.getHeader(headerName)).append(", "));
+							logResponse.addHeader(headerName, response.getHeader(headerName)));
 		}
+		if (response.getContentType() != null) {
+			logResponse.setContentType(response.getContentType());
+		}
+		logResponse.setResponseCode(response.getStatus());
 		try {
-			msg.append("; payload=").append(new String(response.toByteArray(), response.getCharacterEncoding()));
+			logResponse.setPayload(new String(response.toByteArray(), response.getCharacterEncoding()));
 		} catch (UnsupportedEncodingException e) {
 			logger.warn("Failed to parse response payload", e);
 		}
-		logger.info(msg.toString());
+		logger.info(append("response", logResponse), logResponse.toString());
+	}
+
+	@Data
+	private class LogRequest {
+		long requestNumber;
+		String sessionId;
+		String method;
+		String uri;
+		String contentType;
+		Map<String, String> headers;
+		String payload;
+
+		void addHeader(String key, String value) {
+			if (headers == null) {
+				headers = new HashMap<>();
+			}
+			headers.put(key, value);
+		}
+	}
+
+	@Data
+	private class LogResponse {
+		long requestNumber;
+		int responseCode;
+		String contentType;
+		Map<String, String> headers;
+		String payload;
+
+		void addHeader(String key, String value) {
+			if (headers == null) {
+				headers = new HashMap<>();
+			}
+			headers.put(key, value);
+		}
 	}
 
 }
