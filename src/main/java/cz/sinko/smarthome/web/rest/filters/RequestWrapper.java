@@ -13,16 +13,18 @@ import org.apache.commons.io.input.TeeInputStream;
 public class RequestWrapper extends HttpServletRequestWrapper {
 
 	private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	private long id;
+	private final long requestNumber;
 
-	public RequestWrapper(Long requestId, HttpServletRequest request) {
+	public RequestWrapper(Long requestNumber, HttpServletRequest request) {
 		super(request);
-		this.id = requestId;
+		this.requestNumber = requestNumber;
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		return new ServletInputStream() {
+			private TeeInputStream tee = new TeeInputStream(RequestWrapper.super.getInputStream(), bos);
+
 			@Override
 			public boolean isFinished() {
 				return false;
@@ -38,8 +40,6 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
 			}
 
-			private TeeInputStream tee = new TeeInputStream(RequestWrapper.super.getInputStream(), bos);
-
 			@Override
 			public int read() throws IOException {
 				return tee.read();
@@ -51,11 +51,8 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 		return bos.toByteArray();
 	}
 
-	public long getId() {
-		return id;
+	public long getRequestNumber() {
+		return requestNumber;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
 }

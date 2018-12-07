@@ -27,8 +27,8 @@ import lombok.Data;
 @Order(2)
 public class LoggingFilter extends OncePerRequestFilter {
 
-	protected static final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
-	private AtomicLong requestNumber = new AtomicLong(0);
+	private static final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
+	private final AtomicLong requestNumber = new AtomicLong(0);
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -56,7 +56,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 	private void logRequest(final HttpServletRequest request) {
 		LogRequest logRequest = new LogRequest();
 		if (request instanceof RequestWrapper) {
-			logRequest.setRequestNumber(((RequestWrapper) request).getId());
+			logRequest.setRequestNumber(((RequestWrapper) request).getRequestNumber());
 		}
 		HttpSession session = request.getSession(false);
 		if (session != null) {

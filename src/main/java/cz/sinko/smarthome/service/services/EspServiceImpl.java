@@ -2,7 +2,6 @@ package cz.sinko.smarthome.service.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,20 +18,22 @@ import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 @Transactional
 public class EspServiceImpl implements EspService {
 
-	@Autowired
-	private RoomInfoDao roomInfoDao;
+	private final RoomInfoDao roomInfoDao;
+	private final OrikaBeanMapper mapper;
 
-	@Autowired
-	private OrikaBeanMapper mapper;
-
-	@Override public List<RoomInfoDto> getRoomInfoByDate(long sensorId, LocalDate date) {
-		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestamp(sensorId, date);
-		return new ArrayList<>(roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList()));
+	@Autowired public EspServiceImpl(RoomInfoDao roomInfoDao, OrikaBeanMapper mapper) {
+		this.roomInfoDao = roomInfoDao;
+		this.mapper = mapper;
 	}
 
-	@Override public List<RoomInfoDto> getRoomInfoFromDateTime(long sensorId, LocalDateTime date) {
+	@Override public List<RoomInfoDto> getRoomInfoByDate(String sensorId, LocalDate date) {
+		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestamp(sensorId, date);
+		return roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList());
+	}
+
+	@Override public List<RoomInfoDto> getRoomInfoFromDateTime(String sensorId, LocalDateTime date) {
 		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestampAfter(sensorId, date);
-		return new ArrayList<>(roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList()));
+		return roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList());
 	}
 
 }

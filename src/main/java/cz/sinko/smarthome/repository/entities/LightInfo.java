@@ -1,7 +1,6 @@
 package cz.sinko.smarthome.repository.entities;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;

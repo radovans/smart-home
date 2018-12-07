@@ -15,8 +15,8 @@ import org.apache.commons.io.output.TeeOutputStream;
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
 	private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	private final long requestNumber;
 	private PrintWriter writer = new PrintWriter(bos);
-	private long requestNumber;
 
 	public ResponseWrapper(Long requestNumber, HttpServletResponse response) {
 		super(response);
@@ -31,6 +31,8 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
 		return new ServletOutputStream() {
+			private TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+
 			@Override
 			public boolean isReady() {
 				return false;
@@ -40,8 +42,6 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 			public void setWriteListener(WriteListener writeListener) {
 
 			}
-
-			private TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
 
 			@Override
 			public void write(int b) throws IOException {
@@ -63,7 +63,4 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 		return requestNumber;
 	}
 
-	public void setRequestNumber(long requestNumber) {
-		this.requestNumber = requestNumber;
-	}
 }

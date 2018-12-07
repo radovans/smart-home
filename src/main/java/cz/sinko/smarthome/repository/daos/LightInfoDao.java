@@ -22,9 +22,11 @@ public interface LightInfoDao extends JpaRepository<LightInfo, Long> {
 	List<LightInfo> findAllByTimestampBetween(LocalDateTime from, LocalDateTime to);
 
 	default List<LightInfo> findAllByDateWithLightingDuration(LocalDate date) {
-		return findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+		return findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(date.atStartOfDay(),
+				date.plusDays(1).atStartOfDay());
 	}
 
-	List<LightInfo> findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(LocalDateTime from, LocalDateTime to);
+	List<LightInfo> findAllByTimestampBetweenAndDurationOfLightingInSecondsIsNotNull(LocalDateTime from,
+			LocalDateTime to);
 
 }

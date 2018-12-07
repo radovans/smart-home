@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("feature")
 public class FeatureDecisions {
 
-	private Map<String, Boolean> toggles = new HashMap<>();
+	private final Map<String, Boolean> toggles = new HashMap<>();
 
 	public Map<String, Boolean> getToggles() {
 		return toggles;

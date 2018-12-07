@@ -23,12 +23,16 @@ import cz.sinko.smarthome.service.services.EspService;
 @RequestMapping(value = "/esp", produces = MediaType.APPLICATION_JSON_VALUE)
 public class EspEndpoint {
 
-	@Autowired
-	private EspService espService;
+	private final EspService espService;
+
+	@Autowired public EspEndpoint(EspService espService) {
+		this.espService = espService;
+	}
 
 	@GetMapping(path = "/{sensorId}")
 	@ResponseStatus(HttpStatus.OK)
-	public List<RoomInfoDto> getRoomInfoByDate(@PathVariable long sensorId, @RequestParam("date") LocalDate date, @RequestParam("from") LocalDateTime fromDateTime) {
+	public List<RoomInfoDto> getRoomInfoByDate(@PathVariable String sensorId, @RequestParam("date") LocalDate date,
+			@RequestParam("from") LocalDateTime fromDateTime) {
 		if (date != null) {
 			return espService.getRoomInfoByDate(sensorId, date);
 		}

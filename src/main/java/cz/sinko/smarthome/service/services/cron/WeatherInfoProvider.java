@@ -28,18 +28,19 @@ import cz.sinko.smarthome.service.dtos.inputs.WeatherInputDto;
 @ConditionalOnProperty(name = "feature.toggles.cron.weather.info", havingValue = "true", matchIfMissing = true)
 public class WeatherInfoProvider {
 
+	private static final String APIKEY = "c2e04a00278031fc5b8e8c78590e2939";
+	private static final String URL = "api.openweathermap.org/data/2.5/weather";
+	private static final String BRNO_ID = "3078610";
+	private static final String UNITS = "metric";
 	private static final Logger logger = LoggerFactory.getLogger(WeatherInfoProvider.class);
 
-	public static final String APIKEY = "c2e04a00278031fc5b8e8c78590e2939";
-	public static final String URL = "api.openweathermap.org/data/2.5/weather";
-	public static final String BRNO_ID = "3078610";
-	public static final String UNITS = "metric";
+	private final WeatherInfoDao weatherInfoDao;
+	private final SunInfoDao sunInfoDao;
 
-	@Autowired
-	private WeatherInfoDao weatherInfoDao;
-
-	@Autowired
-	private SunInfoDao sunInfoDao;
+	@Autowired public WeatherInfoProvider(WeatherInfoDao weatherInfoDao, SunInfoDao sunInfoDao) {
+		this.weatherInfoDao = weatherInfoDao;
+		this.sunInfoDao = sunInfoDao;
+	}
 
 	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
 	public void checkSunInfo() {

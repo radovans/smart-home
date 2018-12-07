@@ -12,8 +12,8 @@ import cz.sinko.smarthome.repository.entities.RoomInfo;
 @Repository
 public interface RoomInfoDao extends JpaRepository<RoomInfo, Long> {
 
-	List<RoomInfo> findAllBySensorIdAndTimestamp(long sensorId, LocalDate timestamp);
+	List<RoomInfo> findAllBySensorIdAndTimestamp(String sensorId, LocalDate timestamp);
 
-	List<RoomInfo> findAllBySensorIdAndTimestampAfter(long sensorId, LocalDateTime timestamp);
+	List<RoomInfo> findAllBySensorIdAndTimestampAfter(String sensorId, LocalDateTime timestamp);
 
 }

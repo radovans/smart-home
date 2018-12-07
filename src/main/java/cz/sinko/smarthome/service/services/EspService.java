@@ -8,8 +8,8 @@ import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 
 public interface EspService {
 
-	List<RoomInfoDto> getRoomInfoByDate(long sensorId, LocalDate date);
+	List<RoomInfoDto> getRoomInfoByDate(String sensorId, LocalDate date);
 
-	List<RoomInfoDto> getRoomInfoFromDateTime(long sensorId, LocalDateTime date);
+	List<RoomInfoDto> getRoomInfoFromDateTime(String sensorId, LocalDateTime date);
 
 }

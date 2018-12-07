@@ -23,12 +23,14 @@ import cz.sinko.smarthome.service.dtos.inputs.LightInfoListInputDto;
 @ConditionalOnProperty(name = "feature.toggles.cron.lights.info", havingValue = "true", matchIfMissing = true)
 public class LightsInfoProvider {
 
+	private static final String USERNAME = "wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS";
 	private static final Logger logger = LoggerFactory.getLogger(LightsInfoProvider.class);
 
-	public static final String USERNAME = "wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS";
+	private final LightInfoDao lightInfoDao;
 
-	@Autowired
-	private LightInfoDao lightInfoDao;
+	@Autowired public LightsInfoProvider(LightInfoDao lightInfoDao) {
+		this.lightInfoDao = lightInfoDao;
+	}
 
 	//TODO: optimize, clean, add mappers, for cycle and check each light separately
 	@Scheduled(fixedRate = 10 * 1000, initialDelay = 5000)

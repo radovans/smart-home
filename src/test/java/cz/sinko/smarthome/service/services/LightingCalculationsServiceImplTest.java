@@ -32,7 +32,7 @@ public class LightingCalculationsServiceImplTest {
 	@Test
 	public void getPowerSavingsByDate() {
 		LightingCalculationsServiceImpl spyLightingCalculationsService =
-				Mockito.spy(new LightingCalculationsServiceImpl());
+				Mockito.spy(new LightingCalculationsServiceImpl(lightInfoDao));
 		Mockito.doReturn(Duration.of(3, HOURS)).when(spyLightingCalculationsService).getLightingDurationByDate(Mockito.any());
 		assertEquals(new BigDecimal(0.65).setScale(2, RoundingMode.HALF_UP),
 				spyLightingCalculationsService.getPowerSavingsByDate(LocalDate.now()));
@@ -48,7 +48,7 @@ public class LightingCalculationsServiceImplTest {
 	public void getLightingDurationByDateOneClosedRecord() {
 		LightInfo lightInfo = new LightInfo();
 		lightInfo.setLightId("1");
-		lightInfo.setDurationOfLightingInSeconds(3600l);
+		lightInfo.setDurationOfLightingInSeconds(3600L);
 
 		ArrayList<LightInfo> lightInfos = new ArrayList<>();
 		lightInfos.add(lightInfo);

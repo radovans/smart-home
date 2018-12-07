@@ -22,11 +22,10 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class RequestIdFilter implements Filter {
 
-	Logger logger = LoggerFactory.getLogger(RequestIdFilter.class);
+	private static final String REQUEST_HEADER_NAME = "X-Request-Id";
+	private final Logger logger = LoggerFactory.getLogger(RequestIdFilter.class);
 
-	public static final String REQUEST_HEADER_NAME = "X-Request-Id";
-
-	@Override public void init(FilterConfig filterConfig) throws ServletException {
+	@Override public void init(FilterConfig filterConfig) {
 	}
 
 	@Override

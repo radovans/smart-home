@@ -13,8 +13,11 @@ import cz.sinko.smarthome.repository.entities.SunInfo;
 @Transactional
 public class WeatherServiceImpl implements WeatherService {
 
-	@Autowired
-	private SunInfoDao sunInfoDao;
+	private final SunInfoDao sunInfoDao;
+
+	@Autowired public WeatherServiceImpl(SunInfoDao sunInfoDao) {
+		this.sunInfoDao = sunInfoDao;
+	}
 
 	@Override public SunInfo getSunInfoByDate(LocalDate date) {
 		return sunInfoDao.findByDate(date);

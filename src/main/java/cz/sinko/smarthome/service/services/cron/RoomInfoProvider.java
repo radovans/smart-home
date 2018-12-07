@@ -22,12 +22,14 @@ import cz.sinko.smarthome.service.dtos.inputs.RoomInfoInputDto;
 @ConditionalOnProperty(name = "feature.toggles.cron.room.info", havingValue = "true", matchIfMissing = true)
 public class RoomInfoProvider {
 
+	private static final String URL = "url";
 	private static final Logger logger = LoggerFactory.getLogger(RoomInfoProvider.class);
 
-	public static final String URL = "url";
+	private final RoomInfoDao roomInfoDao;
 
-	@Autowired
-	private RoomInfoDao roomInfoDao;
+	@Autowired public RoomInfoProvider(RoomInfoDao roomInfoDao) {
+		this.roomInfoDao = roomInfoDao;
+	}
 
 	@Scheduled(fixedRate = 60 * 1000, initialDelay = 5000)
 	public void checkRoomInfo() {
