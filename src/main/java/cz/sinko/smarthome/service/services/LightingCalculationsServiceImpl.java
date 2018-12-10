@@ -12,10 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cz.sinko.smarthome.repository.daos.LightInfoDao;
-import cz.sinko.smarthome.repository.entities.LightInfo;
+import cz.sinko.smarthome.repository.daos.LightingDurationDao;
+import cz.sinko.smarthome.repository.entities.LightingDuration;
 
 //TODO: calculate lightings duration while sun is up
+//TODO: cover calculations with tests
 @Service
 @Transactional
 public class LightingCalculationsServiceImpl implements LightingCalculationsService {
@@ -25,18 +26,18 @@ public class LightingCalculationsServiceImpl implements LightingCalculationsServ
 	private static final BigDecimal NORMAL_BULB_POWER_CONSUMPTION_IN_WATTS = new BigDecimal(75);
 	private static final BigDecimal WATTS_IN_KILOWATTS = new BigDecimal(1000);
 
-	private final LightInfoDao lightInfoDao;
+	private final LightingDurationDao lightingDurationDao;
 
-	@Autowired public LightingCalculationsServiceImpl(LightInfoDao lightInfoDao) {
-		this.lightInfoDao = lightInfoDao;
+	@Autowired public LightingCalculationsServiceImpl(LightingDurationDao lightingDurationDao) {
+		this.lightingDurationDao = lightingDurationDao;
 	}
 
 	//TODO: cover edge cases, when light is turned on during midnight
 	@Override
 	public Duration getLightingDurationByDate(LocalDate date) {
-		List<LightInfo> allLightsInfoByDate = lightInfoDao.findAllByDateWithLightingDuration(date);
+		List<LightingDuration> allLightsDurationByDate = lightingDurationDao.findAllByDate(date);
 		long durationOfLightingInSeconds =
-				allLightsInfoByDate.stream().mapToLong(LightInfo::getDurationOfLightingInSeconds).sum();
+				allLightsDurationByDate.stream().mapToLong(LightingDuration::getDurationOfLightingInSeconds).sum();
 		return Duration.of(durationOfLightingInSeconds, SECONDS);
 	}
 

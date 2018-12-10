@@ -1,4 +1,4 @@
-package cz.sinko.smarthome.web.rest.endpoints.lightening;
+package cz.sinko.smarthome.web.rest.endpoints.lighting;
 
 import java.math.BigDecimal;
 import java.time.Duration;

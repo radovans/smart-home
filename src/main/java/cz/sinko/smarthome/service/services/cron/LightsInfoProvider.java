@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import cz.sinko.smarthome.repository.daos.LightInfoDao;
-import cz.sinko.smarthome.repository.entities.LightInfo;
+import cz.sinko.smarthome.repository.daos.LightDao;
+import cz.sinko.smarthome.repository.daos.LightStateDao;
+import cz.sinko.smarthome.repository.daos.LightingDurationDao;
+import cz.sinko.smarthome.repository.entities.Light;
+import cz.sinko.smarthome.repository.entities.LightState;
+import cz.sinko.smarthome.repository.entities.LightingDuration;
 import cz.sinko.smarthome.repository.entities.enums.State;
 import cz.sinko.smarthome.service.dtos.inputs.LightInfoListInputDto;
 
@@ -26,10 +30,15 @@ public class LightsInfoProvider {
 	private static final String USERNAME = "wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS";
 	private static final Logger logger = LoggerFactory.getLogger(LightsInfoProvider.class);
 
-	private final LightInfoDao lightInfoDao;
+	private final LightStateDao lightStateDao;
+	private final LightDao lightDao;
+	private final LightingDurationDao lightingDurationDao;
 
-	@Autowired public LightsInfoProvider(LightInfoDao lightInfoDao) {
-		this.lightInfoDao = lightInfoDao;
+	@Autowired public LightsInfoProvider(LightStateDao lightStateDao, LightDao lightDao,
+			LightingDurationDao lightingDurationDao) {
+		this.lightStateDao = lightStateDao;
+		this.lightDao = lightDao;
+		this.lightingDurationDao = lightingDurationDao;
 	}
 
 	//TODO: optimize, clean, add mappers, for cycle and check each light separately
@@ -39,13 +48,15 @@ public class LightsInfoProvider {
 		LightInfoListInputDto lightsInfo = getLightsInfo();
 		logger.debug(lightsInfo.toString());
 
+		Light light = lightDao.findByLightId(lightsInfo.getLightInfoInputDto1().getUniqueId()).get();
+
 		State oldState = null, newState, oldReachableState = null, newReachableState;
 		LocalDateTime lastChange = null;
 		LocalDateTime now = LocalDateTime.now();
 		Duration durationOfLighting = null;
 
-		Optional<LightInfo> lastLightInfo =
-				lightInfoDao.findFirstByLightIdOrderByTimestampDesc(lightsInfo.getLightInfoInputDto1().getUniqueId());
+		Optional<LightState> lastLightInfo =
+				lightStateDao.findFirstByLightOrderByTimestampDesc(light);
 		if (lastLightInfo.isPresent()) {
 			oldState = lastLightInfo.get().getNewState();
 			oldReachableState = lastLightInfo.get().getNewReachableState();
@@ -56,8 +67,9 @@ public class LightsInfoProvider {
 		newReachableState = determineNewReachableState(lightsInfo);
 		durationOfLighting = computeDurationOfLighting(oldState, newState, oldReachableState, newReachableState,
 				lastChange, now);
-		createNewLightInfo(lightsInfo, oldState, newState, oldReachableState, newReachableState, durationOfLighting,
+		createNewLightInfo(light, oldState, newState, oldReachableState, newReachableState,
 				now);
+		createNewLightDuration(light, lastChange, now, durationOfLighting);
 	}
 
 	private Duration computeDurationOfLighting(State oldState, State newState, State oldReachableState,
@@ -97,19 +109,28 @@ public class LightsInfoProvider {
 		return newReachableState;
 	}
 
-	private void createNewLightInfo(LightInfoListInputDto lightsInfo, State oldState, State newState,
-			State oldReachableState, State newReachableState, Duration durationOfLighting, LocalDateTime now) {
+	private void createNewLightInfo(Light light, State oldState, State newState,
+			State oldReachableState, State newReachableState, LocalDateTime now) {
 		if (oldState != newState || oldReachableState != newReachableState) {
-			LightInfo lightInfo = new LightInfo();
-			lightInfo.setLightId(lightsInfo.getLightInfoInputDto1().getUniqueId());
-			lightInfo.setOldState(oldState);
-			lightInfo.setOldReachableState(oldReachableState);
-			lightInfo.setNewState(newState);
-			lightInfo.setNewReachableState(newReachableState);
-			lightInfo.setDurationOfLightingInSeconds(
-					durationOfLighting == null ? null : durationOfLighting.getSeconds());
-			lightInfo.setTimestamp(now);
-			lightInfoDao.save(lightInfo);
+			LightState lightState = new LightState();
+			lightState.setLight(light);
+			lightState.setOldState(oldState);
+			lightState.setOldReachableState(oldReachableState);
+			lightState.setNewState(newState);
+			lightState.setNewReachableState(newReachableState);
+			lightState.setTimestamp(now);
+			lightStateDao.save(lightState);
+		}
+	}
+
+	private void createNewLightDuration(Light light, LocalDateTime lastChange, LocalDateTime now, Duration durationOfLighting) {
+		if(durationOfLighting != null) {
+			LightingDuration lightingDuration = new LightingDuration();
+			lightingDuration.setLight(light);
+			lightingDuration.setDurationOfLightingInSeconds(durationOfLighting.getSeconds());
+			lightingDuration.setLightingFrom(lastChange);
+			lightingDuration.setLightingTo(now);
+			lightingDurationDao.save(lightingDuration);
 		}
 	}
 

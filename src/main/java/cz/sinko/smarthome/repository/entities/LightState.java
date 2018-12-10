@@ -14,17 +14,16 @@ import javax.validation.constraints.NotNull;
 import cz.sinko.smarthome.repository.entities.enums.State;
 import lombok.Data;
 
-//TODO: split light info and light bulb, save bulb power consuption for proper saving calculations
 @Data
-@Entity(name = "lights_info")
-public class LightInfo implements Serializable {
+@Entity(name = "lights_states")
+public class LightState implements Serializable {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@NotNull
-	private String lightId;
+	private Light light;
 
 	@Column(name = "old_state")
 	@Enumerated(EnumType.STRING)
@@ -43,9 +42,6 @@ public class LightInfo implements Serializable {
 	@Column(name = "new_reachable_state")
 	@Enumerated(EnumType.STRING)
 	private State newReachableState;
-
-	@Column(name = "duration_of_lighting")
-	private Long durationOfLightingInSeconds;
 
 	@NotNull
 	private LocalDateTime timestamp;
