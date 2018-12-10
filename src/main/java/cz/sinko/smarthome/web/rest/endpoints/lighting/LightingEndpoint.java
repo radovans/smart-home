@@ -18,7 +18,7 @@ import cz.sinko.smarthome.service.services.LightingService;
 
 @RestController
 @Validated
-@RequestMapping(value = "/lightening", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/lighting", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LightingEndpoint {
 
 	private final LightingService lightingService;
@@ -53,17 +53,5 @@ public class LightingEndpoint {
 	public Duration getLightingDurationByDate() {
 		return lightingCalculationsService.getLightingDurationByDate(LocalDate.now());
 	}
-
-	//	@GetMapping(path = "/lights/{id}")
-	//	@ResponseStatus(HttpStatus.OK)
-	//	public LightDto getLightById(@NotNull @PathVariable("id") long id) {
-	//		return lightingService.getLightById(id);
-	//	}
-	//
-	//	@PutMapping(path = "/lights/{id}/state")
-	//	@ResponseStatus(HttpStatus.OK)
-	//	public void changeLightByIdState(@NotNull @PathVariable("id") long id) {
-	//		lightingService.changeLightByIdState(id);
-	//	}
 
 }

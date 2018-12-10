@@ -3,12 +3,16 @@ package cz.sinko.smarthome.repository.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import cz.sinko.smarthome.repository.entities.enums.State;
@@ -23,6 +27,8 @@ public class LightState implements Serializable {
 	private Long id;
 
 	@NotNull
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "light_id")
 	private Light light;
 
 	@Column(name = "old_state")

@@ -2,6 +2,7 @@ package cz.sinko.smarthome.repository.entities;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,6 +19,7 @@ public class Light implements Serializable {
 	private Long id;
 
 	@NotNull
+	@Column(name = "light_id", unique = true)
 	private String lightId;
 
 }

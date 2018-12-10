@@ -17,6 +17,7 @@ import cz.sinko.smarthome.repository.entities.LightingDuration;
 
 //TODO: calculate lightings duration while sun is up
 //TODO: cover calculations with tests
+//TODO: cloudiness should have role in power savings
 @Service
 @Transactional
 public class LightingCalculationsServiceImpl implements LightingCalculationsService {

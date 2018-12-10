@@ -20,7 +20,8 @@ import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.repository.entities.LightState;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
 import cz.sinko.smarthome.repository.entities.enums.State;
-import cz.sinko.smarthome.service.dtos.inputs.LightInfoListInputDto;
+import cz.sinko.smarthome.service.dtos.inputs.LightInfoInputDto;
+import cz.sinko.smarthome.web.rest.exceptions.UnknownLightException;
 
 @Service
 @Transactional
@@ -41,35 +42,42 @@ public class LightsInfoProvider {
 		this.lightingDurationDao = lightingDurationDao;
 	}
 
-	//TODO: optimize, clean, add mappers, for cycle and check each light separately
-	@Scheduled(fixedRate = 10 * 1000, initialDelay = 5000)
-	public void checkLightsState() {
+	//TODO: optimize, clean
+	@Scheduled(fixedRate = 10 * 1000, initialDelay = 10000)
+	public void checkLightsState() throws UnknownLightException {
 		logger.info("Checking lights states");
-		LightInfoListInputDto lightsInfo = getLightsInfo();
-		logger.debug(lightsInfo.toString());
-
-		Light light = lightDao.findByLightId(lightsInfo.getLightInfoInputDto1().getUniqueId()).get();
+		int lightCount = lightDao.findAll().size();
 
 		State oldState = null, newState, oldReachableState = null, newReachableState;
 		LocalDateTime lastChange = null;
-		LocalDateTime now = LocalDateTime.now();
-		Duration durationOfLighting = null;
+		LocalDateTime now = LocalDateTime.now().withNano(0);
+		Duration durationOfLighting;
 
-		Optional<LightState> lastLightInfo =
-				lightStateDao.findFirstByLightOrderByTimestampDesc(light);
-		if (lastLightInfo.isPresent()) {
-			oldState = lastLightInfo.get().getNewState();
-			oldReachableState = lastLightInfo.get().getNewReachableState();
-			lastChange = lastLightInfo.get().getTimestamp();
+		for (int i = 1; i <= lightCount; i++) {
+			LightInfoInputDto lightInfoInputDto = getLightInfo(i);
+			Optional<Light> optionalLight = lightDao.findByLightId(lightInfoInputDto.getUniqueId());
+			if (optionalLight.isPresent()) {
+				Light light = optionalLight.get();
+				Optional<LightState> lastLightInfo =
+						lightStateDao.findFirstByLightOrderByTimestampDesc(light);
+				if (lastLightInfo.isPresent()) {
+					oldState = lastLightInfo.get().getNewState();
+					oldReachableState = lastLightInfo.get().getNewReachableState();
+					lastChange = lastLightInfo.get().getTimestamp();
+				}
+
+				newState = determineNewState(lightInfoInputDto);
+				newReachableState = determineNewReachableState(lightInfoInputDto);
+				durationOfLighting = computeDurationOfLighting(oldState, newState, oldReachableState,
+						newReachableState,
+						lastChange, now);
+				createNewLightInfo(light, oldState, newState, oldReachableState, newReachableState,
+						now);
+				createNewLightDuration(light, lastChange, now, durationOfLighting);
+			} else {
+				throw new UnknownLightException("Unknown light" + lightInfoInputDto.toString());
+			}
 		}
-
-		newState = determineNewState(lightsInfo);
-		newReachableState = determineNewReachableState(lightsInfo);
-		durationOfLighting = computeDurationOfLighting(oldState, newState, oldReachableState, newReachableState,
-				lastChange, now);
-		createNewLightInfo(light, oldState, newState, oldReachableState, newReachableState,
-				now);
-		createNewLightDuration(light, lastChange, now, durationOfLighting);
 	}
 
 	private Duration computeDurationOfLighting(State oldState, State newState, State oldReachableState,
@@ -89,24 +97,12 @@ public class LightsInfoProvider {
 		return null;
 	}
 
-	private State determineNewState(LightInfoListInputDto lightsInfo) {
-		State newState;
-		if (lightsInfo.getLightInfoInputDto1().getLightInfoStateInputDto().isOn()) {
-			newState = State.ON;
-		} else {
-			newState = State.OFF;
-		}
-		return newState;
+	private State determineNewState(LightInfoInputDto lightInfoInputDto) {
+		return lightInfoInputDto.getLightInfoStateInputDto().isOn() ? State.ON : State.OFF;
 	}
 
-	private State determineNewReachableState(LightInfoListInputDto lightsInfo) {
-		State newReachableState;
-		if (lightsInfo.getLightInfoInputDto1().getLightInfoStateInputDto().isReachable()) {
-			newReachableState = State.ON;
-		} else {
-			newReachableState = State.OFF;
-		}
-		return newReachableState;
+	private State determineNewReachableState(LightInfoInputDto lightInfoInputDto) {
+		return lightInfoInputDto.getLightInfoStateInputDto().isReachable() ? State.ON : State.OFF;
 	}
 
 	private void createNewLightInfo(Light light, State oldState, State newState,
@@ -123,8 +119,9 @@ public class LightsInfoProvider {
 		}
 	}
 
-	private void createNewLightDuration(Light light, LocalDateTime lastChange, LocalDateTime now, Duration durationOfLighting) {
-		if(durationOfLighting != null) {
+	private void createNewLightDuration(Light light, LocalDateTime lastChange, LocalDateTime now,
+			Duration durationOfLighting) {
+		if (durationOfLighting != null) {
 			LightingDuration lightingDuration = new LightingDuration();
 			lightingDuration.setLight(light);
 			lightingDuration.setDurationOfLightingInSeconds(durationOfLighting.getSeconds());
@@ -134,11 +131,10 @@ public class LightsInfoProvider {
 		}
 	}
 
-	private LightInfoListInputDto getLightsInfo() {
-		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights";
+	private LightInfoInputDto getLightInfo(int bulbNumber) {
+		final String uri = "http://192.168.0.241/api/" + USERNAME + "/lights/" + bulbNumber;
 		RestTemplate restTemplate = new RestTemplate();
-		logger.debug(restTemplate.getForObject(uri, String.class));
-		return restTemplate.getForObject(uri, LightInfoListInputDto.class);
+		return restTemplate.getForObject(uri, LightInfoInputDto.class);
 	}
 
 }
