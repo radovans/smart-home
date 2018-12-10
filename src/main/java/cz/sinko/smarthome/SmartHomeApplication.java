@@ -1,5 +1,10 @@
 package cz.sinko.smarthome;
 
+import java.util.Date;
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +21,12 @@ public class SmartHomeApplication {
 		SpringApplication.run(SmartHomeApplication.class, args);
 		logger.info("Application: http://localhost:8080/actuator/health");
 		logger.info("Swagger doc: http://localhost:8080/swagger-ui.html");
+	}
+
+	@PostConstruct
+	void afterStart() {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		logger.warn("Spring boot application running in UTC timezone: " + new Date());
 	}
 
 }

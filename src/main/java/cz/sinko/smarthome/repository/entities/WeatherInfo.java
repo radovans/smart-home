@@ -22,7 +22,6 @@ public class WeatherInfo implements Serializable {
 	@NotNull
 	private BigDecimal temperature;
 
-	//TODO: Store times in UTC
 	@NotNull
 	private LocalDateTime timestamp;
 }
