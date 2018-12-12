@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+//TODO: remove duration of lighting
 @Data
 @Entity(name = "lighting_durations")
 public class LightingDuration implements Serializable {

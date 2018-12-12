@@ -125,8 +125,8 @@ public class LightsInfoProvider {
 			LightingDuration lightingDuration = new LightingDuration();
 			lightingDuration.setLight(light);
 			lightingDuration.setDurationOfLightingInSeconds(durationOfLighting.getSeconds());
-			lightingDuration.setLightingFrom(lastChange);
-			lightingDuration.setLightingTo(now);
+			lightingDuration.setLightingFrom(lastChange.withNano(0));
+			lightingDuration.setLightingTo(now.withNano(0));
 			lightingDurationDao.save(lightingDuration);
 		}
 	}

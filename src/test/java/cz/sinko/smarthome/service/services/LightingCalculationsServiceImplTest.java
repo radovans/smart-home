@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import cz.sinko.smarthome.repository.daos.LightingDurationDao;
+import cz.sinko.smarthome.repository.daos.SunInfoDao;
 import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
 
@@ -27,13 +28,16 @@ public class LightingCalculationsServiceImplTest {
 	@Mock
 	LightingDurationDao lightingDurationDao;
 
+	@Mock
+	SunInfoDao sunInfoDao;
+
 	@InjectMocks
 	LightingCalculationsServiceImpl lightingCalculationsServiceImpl;
 
 	@Test
 	public void getPowerSavingsByDate() {
 		LightingCalculationsServiceImpl spyLightingCalculationsService =
-				Mockito.spy(new LightingCalculationsServiceImpl(lightingDurationDao));
+				Mockito.spy(new LightingCalculationsServiceImpl(lightingDurationDao, sunInfoDao));
 		Mockito.doReturn(Duration.of(3, HOURS)).when(spyLightingCalculationsService).getLightingDurationByDate(Mockito.any());
 		assertEquals(new BigDecimal(0.65).setScale(2, RoundingMode.HALF_UP),
 				spyLightingCalculationsService.getPowerSavingsByDate(LocalDate.now()));
