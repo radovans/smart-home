@@ -46,7 +46,7 @@ public class WeatherInfoProvider {
 	public void checkSunInfo() {
 		LocalDate today = LocalDate.now();
 		if (sunInfoDao.findByDate(today) == null) {
-			logger.info("Checking sun info");
+			logger.debug("Checking sun info");
 			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 			logger.debug(weatherInputDto.toString());
 			SunInfo sunInfo = new SunInfo();
@@ -65,7 +65,7 @@ public class WeatherInfoProvider {
 
 	@Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 5000)
 	public void checkWeatherInfo() {
-		logger.info("Checking weather info");
+		logger.debug("Checking weather info");
 		WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 		logger.debug(weatherInputDto.toString());
 		WeatherInfo weatherInfo = new WeatherInfo();

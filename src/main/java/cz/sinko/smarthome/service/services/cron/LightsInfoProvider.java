@@ -44,11 +44,12 @@ public class LightsInfoProvider {
 
 	//TODO: optimize, clean
 	@Scheduled(fixedRate = 10 * 1000, initialDelay = 10000)
-	public void checkLightsState() throws UnknownLightException {
-		logger.info("Checking lights states");
+	public void checkLightsState() {
+		logger.debug("Checking lights states");
 		int lightCount = lightDao.findAll().size();
 
-		State oldState = null, newState, oldReachableState = null, newReachableState;
+		State oldState = null, oldReachableState = null;
+		State newState, newReachableState;
 		LocalDateTime lastChange = null;
 		LocalDateTime now = LocalDateTime.now().withNano(0);
 		Duration durationOfLighting;

@@ -22,9 +22,8 @@ import cz.sinko.smarthome.service.dtos.inputs.RoomInfoInputDto;
 @ConditionalOnProperty(name = "feature.toggles.cron.room.info", havingValue = "true", matchIfMissing = true)
 public class RoomInfoProvider {
 
-	private static final String URL = "url";
+	private static final String URL = "192.168.0.200";
 	private static final Logger logger = LoggerFactory.getLogger(RoomInfoProvider.class);
-
 	private final RoomInfoDao roomInfoDao;
 
 	@Autowired public RoomInfoProvider(RoomInfoDao roomInfoDao) {
@@ -34,16 +33,21 @@ public class RoomInfoProvider {
 	@Scheduled(fixedRate = 60 * 1000, initialDelay = 5000)
 	public void checkRoomInfo() {
 		logger.debug("Checking room info");
-		RoomInfoInputDto roomInfoInputDto = getRoomInfo();
-		logger.debug(roomInfoInputDto.toString());
-		RoomInfo roomInfo = new RoomInfo();
-		roomInfo.setHumidity(BigDecimal.valueOf(Double.parseDouble(roomInfoInputDto.getHumidity())).setScale(2,
-				RoundingMode.HALF_UP));
-		roomInfo.setTemperature(BigDecimal.valueOf(Double.parseDouble(roomInfoInputDto.getTemperature())).setScale(2,
-				RoundingMode.HALF_UP));
-		roomInfo.setSensorId(roomInfoInputDto.getSensorId());
-		roomInfo.setTimestamp(LocalDateTime.now());
-		roomInfoDao.save(roomInfo);
+		RoomInfoInputDto roomInfoInputDto = null;
+		try {
+			roomInfoInputDto = getRoomInfo();
+			RoomInfo roomInfo = new RoomInfo();
+			roomInfo.setHumidity(BigDecimal.valueOf(Double.parseDouble(roomInfoInputDto.getHumidity())).setScale(2,
+					RoundingMode.HALF_UP));
+			roomInfo.setTemperature(BigDecimal.valueOf(Double.parseDouble(roomInfoInputDto.getTemperature())).setScale(2,
+					RoundingMode.HALF_UP));
+			//TODO: change ESP implementation so ESP got sensor id
+			roomInfo.setSensorId("esp1");
+			roomInfo.setTimestamp(LocalDateTime.now());
+			roomInfoDao.save(roomInfo);
+		} catch (NumberFormatException exception) {
+			logger.warn("ESP is not responding data: " + roomInfoInputDto.toString());
+		}
 	}
 
 	private RoomInfoInputDto getRoomInfo() {

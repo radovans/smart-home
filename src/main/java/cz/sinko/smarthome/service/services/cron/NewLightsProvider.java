@@ -30,8 +30,8 @@ public class NewLightsProvider {
 	}
 
 	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
-	public void finNewLights() throws UnknownLightException {
-		logger.info("Looking for new lights");
+	public void findNewLights() throws UnknownLightException {
+		logger.debug("Looking for new lights");
 		NewLightsInputDto newLightsInputDto = getAllLights();
 		logger.debug(newLightsInputDto.toString());
 
