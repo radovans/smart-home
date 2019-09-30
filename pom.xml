@@ -14,21 +14,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.5.RELEASE</version>
+		<version>2.1.8.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-
+		<java.version>11</java.version>
 		<apache.commons.version>2.6</apache.commons.version>
-		<codehouse.janino.version>3.0.10</codehouse.janino.version>
-		<logback-json.version>0.1.5</logback-json.version>
-		<logback-encoder.version>5.2</logback-encoder.version>
-		<lombok.version>1.18.2</lombok.version>
-		<orika.version>1.5.2</orika.version>
+		<lombok.version>1.18.8</lombok.version>
+		<orika.version>1.5.4</orika.version>
 		<spring-fox-swagger.version>2.9.2</spring-fox-swagger.version>
 	</properties>
 
@@ -40,6 +36,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -57,7 +59,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -95,31 +100,12 @@
 			<version>${apache.commons.version}</version>
 		</dependency>
 
-		<!--Logging in json format-->
-		<dependency>
-			<groupId>ch.qos.logback.contrib</groupId>
-			<artifactId>logback-json-classic</artifactId>
-			<version>${logback-json.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback.contrib</groupId>
-			<artifactId>logback-jackson</artifactId>
-			<version>${logback-json.version}</version>
-		</dependency>
-
-		<!--Log objects in json format-->
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>${logback-encoder.version}</version>
-		</dependency>
-
 		<!--Log config if condition-->
-		<dependency>
-			<groupId>org.codehaus.janino</groupId>
-			<artifactId>janino</artifactId>
-			<version>${codehouse.janino.version}</version>
-		</dependency>
+		<!--		<dependency>-->
+		<!--			<groupId>org.codehaus.janino</groupId>-->
+		<!--			<artifactId>janino</artifactId>-->
+		<!--			<version>${codehouse.janino.version}</version>-->
+		<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -131,7 +117,22 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.5</version>
+		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>3.24.0-GA</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

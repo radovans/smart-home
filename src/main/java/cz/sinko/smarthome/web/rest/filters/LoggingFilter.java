@@ -1,13 +1,12 @@
 package cz.sinko.smarthome.web.rest.filters;
 
-import static net.logstash.logback.marker.Markers.append;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,19 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import lombok.Data;
+import com.google.gson.Gson;
 
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Component
 @Order(2)
 public class LoggingFilter extends OncePerRequestFilter {
 
-	private static final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
 	private final AtomicLong requestNumber = new AtomicLong(0);
 
 	@Override
@@ -35,25 +35,21 @@ public class LoggingFilter extends OncePerRequestFilter {
 			final FilterChain filterChain)
 			throws ServletException, IOException {
 		if (!SkipLoggingAndRequestId.skip(request)) {
-			if (logger.isDebugEnabled()) {
-				long requestNumber = this.requestNumber.incrementAndGet();
-				request = new RequestWrapper(requestNumber, request);
-				response = new ResponseWrapper(requestNumber, response);
-			}
+			long requestNumber = this.requestNumber.incrementAndGet();
+			request = new RequestWrapper(requestNumber, request);
+			response = new ResponseWrapper(requestNumber, response);
+			logRequest(request);
 			try {
 				filterChain.doFilter(request, response);
 			} finally {
-				if (logger.isDebugEnabled()) {
-					logRequest(request);
-					logResponse((ResponseWrapper) response);
-				}
+				logResponse((ResponseWrapper) response);
 			}
 		} else {
 			filterChain.doFilter(request, response);
 		}
 	}
 
-	private void logRequest(final HttpServletRequest request) {
+	private void logRequest(final HttpServletRequest request) throws IOException {
 		LogRequest logRequest = new LogRequest();
 		if (request instanceof RequestWrapper) {
 			logRequest.setRequestNumber(((RequestWrapper) request).getRequestNumber());
@@ -80,17 +76,10 @@ public class LoggingFilter extends OncePerRequestFilter {
 
 		if (request instanceof RequestWrapper && !isMultipart(request) && !isBinaryContent(request)) {
 			RequestWrapper requestWrapper = (RequestWrapper) request;
-			try {
-				String charEncoding =
-						requestWrapper.getCharacterEncoding() != null ? requestWrapper.getCharacterEncoding() :
-								"UTF-8";
-				logRequest.setPayload(new String(requestWrapper.toByteArray(), charEncoding));
-			} catch (UnsupportedEncodingException e) {
-				logger.warn("Failed to parse request payload", e);
-			}
-
+			String payload = requestWrapper.getReader().lines().collect(Collectors.joining());
+			logRequest.setPayload(new Gson().fromJson(payload, Map.class));
 		}
-		logger.info(append("request", logRequest), logRequest.toString());
+		log.info(logRequest);
 	}
 
 	private boolean isBinaryContent(final HttpServletRequest request) {
@@ -118,11 +107,12 @@ public class LoggingFilter extends OncePerRequestFilter {
 		}
 		logResponse.setResponseCode(response.getStatus());
 		try {
-			logResponse.setPayload(new String(response.toByteArray(), response.getCharacterEncoding()));
+			String payload = new String(response.toByteArray(), response.getCharacterEncoding());
+			logResponse.setPayload(new Gson().fromJson(payload, Map.class));
 		} catch (UnsupportedEncodingException e) {
-			logger.warn("Failed to parse response payload", e);
+			log.warn("Failed to parse response payload", e);
 		}
-		logger.info(append("response", logResponse), logResponse.toString());
+		log.info(logResponse);
 	}
 
 	@Data
@@ -133,7 +123,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 		String uri;
 		String contentType;
 		Map<String, String> headers;
-		String payload;
+		Map<String, Object> payload;
 
 		void addHeader(String key, String value) {
 			if (headers == null) {
@@ -149,7 +139,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 		int responseCode;
 		String contentType;
 		Map<String, String> headers;
-		String payload;
+		Map<String, Object> payload;
 
 		void addHeader(String key, String value) {
 			if (headers == null) {
@@ -158,5 +148,4 @@ public class LoggingFilter extends OncePerRequestFilter {
 			headers.put(key, value);
 		}
 	}
-
 }
