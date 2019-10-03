@@ -11,3 +11,12 @@ Features:
 - Feature flags - you can enable or disable some parts of application e.g. if you dont have esp module you can disable cron with feature flag - feature.toggles.cron.room.info=false
 - You can switch between classic and Json output of the log by feature flag - feature.toggles.logging.output.json=true
 - Auto Swagger documentation
+
+How to start application:
+- Install postgres database with docker:
+docker run -d -p 5432:5432 --name smart-home-postgres --restart always -e POSTGRES_USER=smarthome -e POSTGRES_PASSWORD=smarthome -e POSTGRES_DB=smarthome -v smart_home_postgres_data:/var/lib/postgresql/data postgres
+- Then you can connect to docker:
+docker exec -it smart-home-postgres bash
+- Then connect to database and check if there are created tables:
+psql -h localhost -U smarthome
+\dt
