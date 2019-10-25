@@ -1,4 +1,4 @@
-package cz.sinko.smarthome.config.security;
+package cz.sinko.smarthome.web.rest.filters;
 
 import java.io.IOException;
 
@@ -7,15 +7,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import cz.sinko.smarthome.config.security.JwtService;
 import cz.sinko.smarthome.repository.entities.User;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceNotFoundException;
 
@@ -33,6 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+		try {
+			setSecurityContext(httpServletRequest, httpServletResponse);
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (!(authentication instanceof AnonymousAuthenticationToken)) {
+				MDC.put("username", authentication.getName());
+				MDC.put("roles", authentication.getAuthorities().toString());
+			}
+			filterChain.doFilter(httpServletRequest, httpServletResponse);
+		} finally {
+			MDC.clear();
+		}
+	}
+
+	private void setSecurityContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 		String token = httpServletRequest.getHeader(tokenHeader);
 		logger.debug("auth header content: " + token);
 		if (token != null) {
@@ -48,6 +66,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
 			}
 		}
-		filterChain.doFilter(httpServletRequest, httpServletResponse);
 	}
 }
