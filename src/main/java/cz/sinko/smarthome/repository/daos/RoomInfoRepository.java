@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import cz.sinko.smarthome.repository.entities.RoomInfo;
 
 @Repository
-public interface RoomInfoDao extends JpaRepository<RoomInfo, Long> {
+public interface RoomInfoRepository extends JpaRepository<RoomInfo, Long> {
 
 	List<RoomInfo> findAllBySensorIdAndTimestamp(String sensorId, LocalDate timestamp);
 

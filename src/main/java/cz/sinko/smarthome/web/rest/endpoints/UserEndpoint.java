@@ -17,15 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import cz.sinko.smarthome.config.security.AdminPermission;
-import cz.sinko.smarthome.config.security.LoggedInPermission;
-import cz.sinko.smarthome.service.dtos.LoginDto;
-import cz.sinko.smarthome.service.dtos.UserWithTokenDto;
-import cz.sinko.smarthome.service.dtos.UserCreateUpdateDto;
-import cz.sinko.smarthome.service.dtos.UserDto;
-import cz.sinko.smarthome.service.dtos.UserListDto;
+import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
+import cz.sinko.smarthome.service.dtos.user.UserDto;
+import cz.sinko.smarthome.service.dtos.user.UserListDto;
 import cz.sinko.smarthome.service.services.UserService;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RestController
 @Validated
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,21 +31,15 @@ public class UserEndpoint {
 
 	private final UserService userService;
 
-	@Autowired public UserEndpoint(UserService userService) {
+	@Autowired
+	public UserEndpoint(UserService userService) {
 		this.userService = userService;
 	}
-
-	@PostMapping(path = "/login")
-	@ResponseStatus(HttpStatus.OK)
-	public UserWithTokenDto login(@RequestBody LoginDto loginDto) {
-		return userService.login(loginDto);
-	}
-
-	//TODO: Logout service, move into AuthEndpoint
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public UserListDto getAllUsers() {
+		log.info("Message");
 		return userService.getAllUsers();
 	}
 

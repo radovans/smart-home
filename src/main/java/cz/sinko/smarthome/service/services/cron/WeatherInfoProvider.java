@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import cz.sinko.smarthome.repository.daos.SunInfoDao;
-import cz.sinko.smarthome.repository.daos.WeatherInfoDao;
+import cz.sinko.smarthome.repository.daos.SunInfoRepository;
+import cz.sinko.smarthome.repository.daos.WeatherInfoRepository;
 import cz.sinko.smarthome.repository.entities.SunInfo;
 import cz.sinko.smarthome.repository.entities.WeatherInfo;
 import cz.sinko.smarthome.service.dtos.inputs.WeatherInputDto;
@@ -34,18 +34,18 @@ public class WeatherInfoProvider {
 	private static final String UNITS = "metric";
 	private static final Logger logger = LoggerFactory.getLogger(WeatherInfoProvider.class);
 
-	private final WeatherInfoDao weatherInfoDao;
-	private final SunInfoDao sunInfoDao;
+	private final WeatherInfoRepository weatherInfoRepository;
+	private final SunInfoRepository sunInfoRepository;
 
-	@Autowired public WeatherInfoProvider(WeatherInfoDao weatherInfoDao, SunInfoDao sunInfoDao) {
-		this.weatherInfoDao = weatherInfoDao;
-		this.sunInfoDao = sunInfoDao;
+	@Autowired public WeatherInfoProvider(WeatherInfoRepository weatherInfoRepository, SunInfoRepository sunInfoRepository) {
+		this.weatherInfoRepository = weatherInfoRepository;
+		this.sunInfoRepository = sunInfoRepository;
 	}
 
 	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
 	public void checkSunInfo() {
 		LocalDate today = LocalDate.now();
-		if (sunInfoDao.findByDate(today) == null) {
+		if (sunInfoRepository.findByDate(today) == null) {
 			logger.debug("Checking sun info");
 			WeatherInputDto weatherInputDto = getWeatherAndSunInfo();
 			logger.debug(weatherInputDto.toString());
@@ -59,7 +59,7 @@ public class WeatherInfoProvider {
 							Long.parseLong(weatherInputDto.getSunriseAndSunset().getSunset())),
 					TimeZone.getDefault().toZoneId())));
 			sunInfo.setDate(today);
-			sunInfoDao.save(sunInfo);
+			sunInfoRepository.save(sunInfo);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class WeatherInfoProvider {
 		WeatherInfo weatherInfo = new WeatherInfo();
 		weatherInfo.setTemperature(BigDecimal.valueOf(Double.parseDouble(weatherInputDto.getTemperature().getTemperature())).setScale(2, RoundingMode.HALF_UP));
 		weatherInfo.setTimestamp(LocalDateTime.now());
-		weatherInfoDao.save(weatherInfo);
+		weatherInfoRepository.save(weatherInfo);
 	}
 
 	private WeatherInputDto getWeatherAndSunInfo() {

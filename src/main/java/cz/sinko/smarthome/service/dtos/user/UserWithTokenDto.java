@@ -1,4 +1,4 @@
-package cz.sinko.smarthome.service.dtos;
+package cz.sinko.smarthome.service.dtos.user;
 
 import java.io.Serializable;
 

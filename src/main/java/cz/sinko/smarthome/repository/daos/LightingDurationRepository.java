@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
 
 @Repository
-public interface LightingDurationDao extends JpaRepository<LightingDuration, Long> {
+public interface LightingDurationRepository extends JpaRepository<LightingDuration, Long> {
 
 	default List<LightingDuration> findAllByDate(LocalDate date) {
 		return findAllByLightingFromAfterAndLightingToBefore(date.atStartOfDay(), date.plusDays(1).atStartOfDay());

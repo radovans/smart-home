@@ -19,7 +19,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import cz.sinko.smarthome.repository.daos.UserDao;
+import cz.sinko.smarthome.repository.daos.UserRepository;
 import cz.sinko.smarthome.repository.entities.User;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceNotFoundException;
 
@@ -30,7 +30,7 @@ public class JwtServiceImpl implements JwtService {
 	private static final Logger LOG = LoggerFactory.getLogger(JwtServiceImpl.class);
 
 	@Autowired
-	private UserDao userDao;
+	private UserRepository userRepository;
 
 	private enum Claims {
 		ID,
@@ -54,7 +54,7 @@ public class JwtServiceImpl implements JwtService {
 								ZoneId.systemDefault()).toInstant()))
 				.sign(algorithm);
 		user.setLoginToken(token);
-		userDao.save(user);
+		userRepository.save(user);
 		return token;
 	}
 
@@ -64,7 +64,8 @@ public class JwtServiceImpl implements JwtService {
 		try {
 			DecodedJWT decoded = JWT.decode(token);
 			Long id = decoded.getClaim(Claims.ID.name()).as(Long.class);
-			User user = userDao.findById(id).get();
+			User user = userRepository.findById(id).orElseThrow(() ->
+					new ResourceNotFoundException(String.format("Invalid user id = %s", id)));
 			if (user.getLoginToken() != null
 					&& user.getLoginToken().equals(token)
 					&& user.isEnabled()) {
@@ -73,7 +74,7 @@ public class JwtServiceImpl implements JwtService {
 				throw new ResourceNotFoundException("Invalid login token");
 			}
 		} catch (JWTDecodeException e) {
-			LOG.error("Error decoding token");
+			LOG.error("Error while decoding token");
 			return null;
 		}
 	}

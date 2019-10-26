@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import cz.sinko.smarthome.repository.entities.WeatherInfo;
 
 @Repository
-public interface WeatherInfoDao extends JpaRepository<WeatherInfo, Long> {
+public interface WeatherInfoRepository extends JpaRepository<WeatherInfo, Long> {
 }

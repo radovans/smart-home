@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import cz.sinko.smarthome.repository.daos.LightingDurationDao;
-import cz.sinko.smarthome.repository.daos.SunInfoDao;
+import cz.sinko.smarthome.repository.daos.LightingDurationRepository;
+import cz.sinko.smarthome.repository.daos.SunInfoRepository;
 import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
 
@@ -26,10 +26,10 @@ import cz.sinko.smarthome.repository.entities.LightingDuration;
 public class LightingCalculationsServiceImplTest {
 
 	@Mock
-	LightingDurationDao lightingDurationDao;
+	LightingDurationRepository lightingDurationRepository;
 
 	@Mock
-	SunInfoDao sunInfoDao;
+	SunInfoRepository sunInfoRepository;
 
 	@InjectMocks
 	LightingCalculationsServiceImpl lightingCalculationsServiceImpl;
@@ -37,7 +37,7 @@ public class LightingCalculationsServiceImplTest {
 	@Test
 	public void getPowerSavingsByDate() {
 		LightingCalculationsServiceImpl spyLightingCalculationsService =
-				Mockito.spy(new LightingCalculationsServiceImpl(lightingDurationDao, sunInfoDao));
+				Mockito.spy(new LightingCalculationsServiceImpl(lightingDurationRepository, sunInfoRepository));
 		Mockito.doReturn(Duration.of(3, HOURS)).when(spyLightingCalculationsService).getLightingDurationByDate(Mockito.any());
 		assertEquals(new BigDecimal(0.65).setScale(2, RoundingMode.HALF_UP),
 				spyLightingCalculationsService.getPowerSavingsByDate(LocalDate.now()));
@@ -45,7 +45,7 @@ public class LightingCalculationsServiceImplTest {
 
 	@Test
 	public void getLightingDurationByDateEmpty() {
-		when(lightingDurationDao.findAllByDate(Mockito.any())).thenReturn(new ArrayList<>());
+		when(lightingDurationRepository.findAllByDate(Mockito.any())).thenReturn(new ArrayList<>());
 		assertEquals(Duration.ZERO, lightingCalculationsServiceImpl.getLightingDurationByDate(LocalDate.now()));
 	}
 
@@ -60,7 +60,7 @@ public class LightingCalculationsServiceImplTest {
 		ArrayList<LightingDuration> lightDurations = new ArrayList<>();
 		lightDurations.add(lightingDuration);
 
-		when(lightingDurationDao.findAllByDate(Mockito.any())).thenReturn(lightDurations);
+		when(lightingDurationRepository.findAllByDate(Mockito.any())).thenReturn(lightDurations);
 		assertEquals(Duration.of(1, HOURS),
 				lightingCalculationsServiceImpl.getLightingDurationByDate(LocalDate.of(2018, 1, 1)));
 	}

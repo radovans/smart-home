@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cz.sinko.smarthome.config.mapper.OrikaBeanMapper;
 import cz.sinko.smarthome.config.security.JwtService;
-import cz.sinko.smarthome.repository.daos.UserDao;
+import cz.sinko.smarthome.repository.daos.UserRepository;
 import cz.sinko.smarthome.repository.entities.User;
 import cz.sinko.smarthome.service.dtos.LoginDto;
-import cz.sinko.smarthome.service.dtos.UserCreateUpdateDto;
-import cz.sinko.smarthome.service.dtos.UserDto;
-import cz.sinko.smarthome.service.dtos.UserListDto;
-import cz.sinko.smarthome.service.dtos.UserWithTokenDto;
+import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
+import cz.sinko.smarthome.service.dtos.user.UserDto;
+import cz.sinko.smarthome.service.dtos.user.UserListDto;
+import cz.sinko.smarthome.service.dtos.user.UserWithTokenDto;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceAlreadyExistsException;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceNotFoundException;
 import lombok.extern.log4j.Log4j2;
@@ -28,13 +28,13 @@ import lombok.extern.log4j.Log4j2;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-	private final UserDao userDao;
+	private final UserRepository userRepository;
 	private final OrikaBeanMapper mapper;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 
-	@Autowired public UserServiceImpl(UserDao userDao, OrikaBeanMapper mapper, PasswordEncoder passwordEncoder, JwtService jwtService) {
-		this.userDao = userDao;
+	@Autowired public UserServiceImpl(UserRepository userRepository, OrikaBeanMapper mapper, PasswordEncoder passwordEncoder, JwtService jwtService) {
+		this.userRepository = userRepository;
 		this.mapper = mapper;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserWithTokenDto login(LoginDto loginDto) {
 		log.info("Logging in user with username " + loginDto.getUsername());
-		Optional<User> userOptional = userDao.findByUsername(loginDto.getUsername());
+		Optional<User> userOptional = userRepository.findByUsername(loginDto.getUsername());
 		if (!userOptional.isPresent()) {
 			throw new ResourceNotFoundException("User does not exists");
 		}
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto getUserById(Long id) throws ResourceNotFoundException {
-		User user = userDao.findById(id).orElseThrow(() ->
+		User user = userRepository.findById(id).orElseThrow(() ->
 				new ResourceNotFoundException(String.format("Invalid user id = %s", id)));
 		return mapper.map(user, UserDto.class);
 	}
@@ -71,35 +71,35 @@ public class UserServiceImpl implements UserService {
 		checkUsername(user.getUsername());
 		user.setEnabled(true);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user = userDao.save(user);
+		user = userRepository.save(user);
 		return mapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public UserDto updateUser(Long id, UserCreateUpdateDto userDto) {
-		User user = userDao.findById(id).orElseThrow(() ->
+		User user = userRepository.findById(id).orElseThrow(() ->
 				new ResourceNotFoundException(String.format("Invalid user id = %s", id)));
 		mapper.map(userDto, user);
 		checkUsername(user.getUsername());
-		user = userDao.save(user);
+		user = userRepository.save(user);
 		return mapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public UserListDto getAllUsers() {
-		List<User> users = userDao.findAll();
+		List<User> users = userRepository.findAll();
 		return new UserListDto(users.stream().map(user -> mapper.map(user, UserDto.class)).collect(Collectors.toList()));
 	}
 
 	@Override
 	public void deleteUser(Long id) {
-		User user = userDao.findById(id).orElseThrow(() ->
+		User user = userRepository.findById(id).orElseThrow(() ->
 				new ResourceNotFoundException(String.format("Invalid user id = %s", id)));
-		userDao.delete(user);
+		userRepository.delete(user);
 	}
 
 	private void checkUsername(String username) {
-		if (userDao.findByUsername(username).isPresent()) {
+		if (userRepository.findByUsername(username).isPresent()) {
 			throw new ResourceAlreadyExistsException(String.format("User with username = %s already exists",
 					username));
 		}

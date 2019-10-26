@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import cz.sinko.smarthome.repository.daos.LightDao;
-import cz.sinko.smarthome.repository.daos.LightStateDao;
-import cz.sinko.smarthome.repository.daos.LightingDurationDao;
+import cz.sinko.smarthome.repository.daos.LightRepository;
+import cz.sinko.smarthome.repository.daos.LightStateRepository;
+import cz.sinko.smarthome.repository.daos.LightingDurationRepository;
 import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.repository.entities.LightState;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
@@ -31,22 +31,22 @@ public class LightsInfoProvider {
 	private static final String USERNAME = "wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS";
 	private static final Logger logger = LoggerFactory.getLogger(LightsInfoProvider.class);
 
-	private final LightStateDao lightStateDao;
-	private final LightDao lightDao;
-	private final LightingDurationDao lightingDurationDao;
+	private final LightStateRepository lightStateRepository;
+	private final LightRepository lightRepository;
+	private final LightingDurationRepository lightingDurationRepository;
 
-	@Autowired public LightsInfoProvider(LightStateDao lightStateDao, LightDao lightDao,
-			LightingDurationDao lightingDurationDao) {
-		this.lightStateDao = lightStateDao;
-		this.lightDao = lightDao;
-		this.lightingDurationDao = lightingDurationDao;
+	@Autowired public LightsInfoProvider(LightStateRepository lightStateRepository, LightRepository lightRepository,
+			LightingDurationRepository lightingDurationRepository) {
+		this.lightStateRepository = lightStateRepository;
+		this.lightRepository = lightRepository;
+		this.lightingDurationRepository = lightingDurationRepository;
 	}
 
 	//TODO: optimize, clean
 	@Scheduled(fixedRate = 10 * 1000, initialDelay = 10000)
 	public void checkLightsState() {
 		logger.debug("Checking lights states");
-		int lightCount = lightDao.findAll().size();
+		int lightCount = lightRepository.findAll().size();
 
 		State oldState = null, oldReachableState = null;
 		State newState, newReachableState;
@@ -56,11 +56,11 @@ public class LightsInfoProvider {
 
 		for (int i = 1; i <= lightCount; i++) {
 			LightInfoInputDto lightInfoInputDto = getLightInfo(i);
-			Optional<Light> optionalLight = lightDao.findByLightId(lightInfoInputDto.getUniqueId());
+			Optional<Light> optionalLight = lightRepository.findByLightId(lightInfoInputDto.getUniqueId());
 			if (optionalLight.isPresent()) {
 				Light light = optionalLight.get();
 				Optional<LightState> lastLightInfo =
-						lightStateDao.findFirstByLightOrderByTimestampDesc(light);
+						lightStateRepository.findFirstByLightOrderByTimestampDesc(light);
 				if (lastLightInfo.isPresent()) {
 					oldState = lastLightInfo.get().getNewState();
 					oldReachableState = lastLightInfo.get().getNewReachableState();
@@ -116,7 +116,7 @@ public class LightsInfoProvider {
 			lightState.setNewState(newState);
 			lightState.setNewReachableState(newReachableState);
 			lightState.setTimestamp(now);
-			lightStateDao.save(lightState);
+			lightStateRepository.save(lightState);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class LightsInfoProvider {
 			lightingDuration.setDurationOfLightingInSeconds(durationOfLighting.getSeconds());
 			lightingDuration.setLightingFrom(lastChange.withNano(0));
 			lightingDuration.setLightingTo(now.withNano(0));
-			lightingDurationDao.save(lightingDuration);
+			lightingDurationRepository.save(lightingDuration);
 		}
 	}
 

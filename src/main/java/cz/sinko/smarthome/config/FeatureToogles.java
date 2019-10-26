@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("feature")
-public class FeatureDecisions {
+public class FeatureToogles {
 
 	private final Map<String, Boolean> toggles = new HashMap<>();
 

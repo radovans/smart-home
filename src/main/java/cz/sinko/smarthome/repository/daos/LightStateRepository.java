@@ -9,7 +9,7 @@ import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.repository.entities.LightState;
 
 @Repository
-public interface LightStateDao extends JpaRepository<LightState, Long> {
+public interface LightStateRepository extends JpaRepository<LightState, Long> {
 
 	Optional<LightState> findFirstByLightOrderByTimestampDesc(Light light);
 

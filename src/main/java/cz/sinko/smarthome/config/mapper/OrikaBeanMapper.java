@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import cz.sinko.smarthome.repository.entities.User;
-import cz.sinko.smarthome.service.dtos.UserCreateUpdateDto;
-import cz.sinko.smarthome.service.dtos.UserDto;
+import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
+import cz.sinko.smarthome.service.dtos.user.UserDto;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;

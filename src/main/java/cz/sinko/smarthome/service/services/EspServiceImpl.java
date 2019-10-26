@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cz.sinko.smarthome.config.mapper.OrikaBeanMapper;
-import cz.sinko.smarthome.repository.daos.RoomInfoDao;
+import cz.sinko.smarthome.repository.daos.RoomInfoRepository;
 import cz.sinko.smarthome.repository.entities.RoomInfo;
 import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 
@@ -18,21 +18,21 @@ import cz.sinko.smarthome.service.dtos.esp.RoomInfoDto;
 @Transactional
 public class EspServiceImpl implements EspService {
 
-	private final RoomInfoDao roomInfoDao;
+	private final RoomInfoRepository roomInfoRepository;
 	private final OrikaBeanMapper mapper;
 
-	@Autowired public EspServiceImpl(RoomInfoDao roomInfoDao, OrikaBeanMapper mapper) {
-		this.roomInfoDao = roomInfoDao;
+	@Autowired public EspServiceImpl(RoomInfoRepository roomInfoRepository, OrikaBeanMapper mapper) {
+		this.roomInfoRepository = roomInfoRepository;
 		this.mapper = mapper;
 	}
 
 	@Override public List<RoomInfoDto> getRoomInfoByDate(String sensorId, LocalDate date) {
-		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestamp(sensorId, date);
+		List<RoomInfo> roomInfoList = roomInfoRepository.findAllBySensorIdAndTimestamp(sensorId, date);
 		return roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList());
 	}
 
 	@Override public List<RoomInfoDto> getRoomInfoFromDateTime(String sensorId, LocalDateTime date) {
-		List<RoomInfo> roomInfoList = roomInfoDao.findAllBySensorIdAndTimestampAfter(sensorId, date);
+		List<RoomInfo> roomInfoList = roomInfoRepository.findAllBySensorIdAndTimestampAfter(sensorId, date);
 		return roomInfoList.stream().map(roomInfo -> mapper.map(roomInfo, RoomInfoDto.class)).collect(Collectors.toList());
 	}
 

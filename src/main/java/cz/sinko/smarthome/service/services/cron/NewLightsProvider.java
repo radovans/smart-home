@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import cz.sinko.smarthome.repository.daos.LightDao;
+import cz.sinko.smarthome.repository.daos.LightRepository;
 import cz.sinko.smarthome.repository.entities.Light;
 import cz.sinko.smarthome.service.dtos.inputs.LightInfoInputDto;
 import cz.sinko.smarthome.service.dtos.inputs.NewLightsInputDto;
@@ -23,10 +23,10 @@ public class NewLightsProvider {
 	private static final String USERNAME = "wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS";
 	private static final Logger logger = LoggerFactory.getLogger(LightsInfoProvider.class);
 
-	private final LightDao lightDao;
+	private final LightRepository lightRepository;
 
-	@Autowired public NewLightsProvider(LightDao lightDao) {
-		this.lightDao = lightDao;
+	@Autowired public NewLightsProvider(LightRepository lightRepository) {
+		this.lightRepository = lightRepository;
 	}
 
 	@Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 5000)
@@ -42,10 +42,10 @@ public class NewLightsProvider {
 		for (int i = 1; i <= bulbCount; i++) {
 			LightInfoInputDto lightInfoInputDto = getLightInfo(i);
 			logger.debug(lightInfoInputDto.toString());
-			if (!lightDao.findByLightId(lightInfoInputDto.getUniqueId()).isPresent()) {
+			if (!lightRepository.findByLightId(lightInfoInputDto.getUniqueId()).isPresent()) {
 				Light light = new Light();
 				light.setLightId(lightInfoInputDto.getUniqueId());
-				lightDao.save(light);
+				lightRepository.save(light);
 			}
 		}
 	}

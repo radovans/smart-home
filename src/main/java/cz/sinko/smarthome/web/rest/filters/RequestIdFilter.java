@@ -13,9 +13,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import lombok.extern.log4j.Log4j2;
+import cz.sinko.smarthome.web.rest.filters.utils.SkipLoggingAndRequestId;
 
-@Log4j2
 @Component
 @Order(1)
 public class RequestIdFilter extends OncePerRequestFilter {
@@ -32,7 +31,6 @@ public class RequestIdFilter extends OncePerRequestFilter {
 			if (requestId == null || requestId.isEmpty() || requestId.isBlank()) {
 				requestId = UUID.randomUUID().toString();
 			}
-			log.debug("RequestId: " + requestId);
 			try {
 				MDC.put("requestId", requestId);
 				response.addHeader(REQUEST_HEADER_NAME, requestId);

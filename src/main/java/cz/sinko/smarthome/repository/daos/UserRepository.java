@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import cz.sinko.smarthome.repository.entities.User;
 
 @Repository
-public interface UserDao extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByUsername(String username);
 

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import cz.sinko.smarthome.repository.entities.User;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceNotFoundException;
 
 @Component
+@Order(2)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
 			setSecurityContext(httpServletRequest, httpServletResponse);
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			if (authentication instanceof UsernamePasswordAuthenticationToken) {
 				MDC.put("username", authentication.getName());
 				MDC.put("roles", authentication.getAuthorities().toString());
 			}

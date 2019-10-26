@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import cz.sinko.smarthome.repository.entities.Light;
 
 @Repository
-public interface LightDao extends JpaRepository<Light, Long> {
+public interface LightRepository extends JpaRepository<Light, Long> {
 
 	Optional<Light> findByLightId(String lightId);
 

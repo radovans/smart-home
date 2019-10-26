@@ -1,4 +1,4 @@
-package cz.sinko.smarthome.web.rest.filters;
+package cz.sinko.smarthome.web.rest.filters.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

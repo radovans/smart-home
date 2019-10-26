@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import cz.sinko.smarthome.repository.daos.RoomInfoDao;
+import cz.sinko.smarthome.repository.daos.RoomInfoRepository;
 import cz.sinko.smarthome.repository.entities.RoomInfo;
 import cz.sinko.smarthome.service.dtos.inputs.RoomInfoInputDto;
 
@@ -24,10 +24,10 @@ public class RoomInfoProvider {
 
 	private static final String URL = "192.168.0.200";
 	private static final Logger logger = LoggerFactory.getLogger(RoomInfoProvider.class);
-	private final RoomInfoDao roomInfoDao;
+	private final RoomInfoRepository roomInfoRepository;
 
-	@Autowired public RoomInfoProvider(RoomInfoDao roomInfoDao) {
-		this.roomInfoDao = roomInfoDao;
+	@Autowired public RoomInfoProvider(RoomInfoRepository roomInfoRepository) {
+		this.roomInfoRepository = roomInfoRepository;
 	}
 
 	@Scheduled(fixedRate = 60 * 1000, initialDelay = 5000)
@@ -44,7 +44,7 @@ public class RoomInfoProvider {
 			//TODO: change ESP implementation so ESP got sensor id
 			roomInfo.setSensorId("esp1");
 			roomInfo.setTimestamp(LocalDateTime.now());
-			roomInfoDao.save(roomInfo);
+			roomInfoRepository.save(roomInfo);
 		} catch (NumberFormatException exception) {
 			logger.warn("ESP is not responding data: " + roomInfoInputDto.toString());
 		}

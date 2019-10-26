@@ -7,13 +7,14 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cz.sinko.smarthome.repository.daos.LightingDurationDao;
-import cz.sinko.smarthome.repository.daos.SunInfoDao;
+import cz.sinko.smarthome.repository.daos.LightingDurationRepository;
+import cz.sinko.smarthome.repository.daos.SunInfoRepository;
 import cz.sinko.smarthome.repository.entities.LightingDuration;
 import cz.sinko.smarthome.repository.entities.SunInfo;
 import cz.sinko.smarthome.service.dtos.lighting.LightingInfoDto;
@@ -30,12 +31,12 @@ public class LightingCalculationsServiceImpl implements LightingCalculationsServ
 	private static final BigDecimal WATTS_IN_KILOWATTS = new BigDecimal(1000);
 	private static final long RESERVE = 20l;
 
-	private final LightingDurationDao lightingDurationDao;
-	private final SunInfoDao sunInfoDao;
+	private final LightingDurationRepository lightingDurationRepository;
+	private final SunInfoRepository sunInfoRepository;
 
-	@Autowired public LightingCalculationsServiceImpl(LightingDurationDao lightingDurationDao, SunInfoDao sunInfoDao) {
-		this.lightingDurationDao = lightingDurationDao;
-		this.sunInfoDao = sunInfoDao;
+	@Autowired public LightingCalculationsServiceImpl(LightingDurationRepository lightingDurationRepository, SunInfoRepository sunInfoRepository) {
+		this.lightingDurationRepository = lightingDurationRepository;
+		this.sunInfoRepository = sunInfoRepository;
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class LightingCalculationsServiceImpl implements LightingCalculationsServ
 	}
 
 	private Duration getDurationBetween(LocalDate date, LocalDateTime start, LocalDateTime end, Duration result) {
-		for (LightingDuration lightingDuration : lightingDurationDao.findAllByDate(date)) {
+		for (LightingDuration lightingDuration : lightingDurationRepository.findAllByDate(date)) {
 			//Between start and end
 			if (lightingDuration.getLightingFrom().isAfter(start)
 					&& lightingDuration.getLightingTo().isBefore(end)) {
@@ -93,13 +94,12 @@ public class LightingCalculationsServiceImpl implements LightingCalculationsServ
 		return costs.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	//TODO: change SunInfo to Optional
 	@Override
 	public Duration getLightingDurationDuringDayByDate(LocalDate date) {
-		SunInfo sunInfo = sunInfoDao.findByDate(date);
-		if (sunInfo != null) {
-			LocalDateTime sunrise = sunInfo.getSunrise().atDate(date).plus(RESERVE, MINUTES);
-			LocalDateTime sunset = sunInfo.getSunset().atDate(date);
+		Optional<SunInfo> sunInfo = sunInfoRepository.findByDate(date);
+		if (sunInfo.isPresent()) {
+			LocalDateTime sunrise = sunInfo.get().getSunrise().atDate(date).plus(RESERVE, MINUTES);
+			LocalDateTime sunset = sunInfo.get().getSunset().atDate(date);
 
 			Duration result = Duration.ZERO;
 			result = getDurationBetween(date, sunrise, sunset, result);

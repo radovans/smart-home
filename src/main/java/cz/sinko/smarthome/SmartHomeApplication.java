@@ -10,10 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import cz.sinko.smarthome.repository.daos.UserDao;
-import cz.sinko.smarthome.repository.entities.User;
+import cz.sinko.smarthome.repository.daos.UserRepository;
 import cz.sinko.smarthome.repository.entities.enums.Role;
-import cz.sinko.smarthome.service.dtos.UserCreateUpdateDto;
+import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
 import cz.sinko.smarthome.service.services.UserService;
 import lombok.extern.log4j.Log4j2;
 
@@ -26,7 +25,7 @@ public class SmartHomeApplication {
 	private UserService userService;
 
 	@Autowired
-	private UserDao userDao;
+	private UserRepository userRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SmartHomeApplication.class, args);
@@ -47,7 +46,7 @@ public class SmartHomeApplication {
 	}
 
 	private void createUserIfNotExists(String username, String password, Role role) {
-		if (userDao.findByUsername(username).isEmpty()) {
+		if (userRepository.findByUsername(username).isEmpty()) {
 			UserCreateUpdateDto user = new UserCreateUpdateDto(username, password, role);
 			userService.createUser(user);
 			log.info("User was created: " + username);
