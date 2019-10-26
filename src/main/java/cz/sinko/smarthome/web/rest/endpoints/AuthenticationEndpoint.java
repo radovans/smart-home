@@ -34,6 +34,6 @@ public class AuthenticationEndpoint {
 		return userService.login(loginDto);
 	}
 
-	//TODO: Logout service, move into AuthEndpoint
+	//TODO: Logout service
 
 }

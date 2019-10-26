@@ -18,6 +18,7 @@
 	</Appenders>
 	<Loggers>
 		<Logger name="cz.sinko.smarthome" level="INFO"/>
+		<Logger name="org.zalando.logbook" level="TRACE"/>
 		<Root level="WARN">
 			<AppenderRef ref="Console"/>
 			<AppenderRef ref="RollingFile"/>
