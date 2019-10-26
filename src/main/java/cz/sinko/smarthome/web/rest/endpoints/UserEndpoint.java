@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.sinko.smarthome.config.security.LoggedInPermission;
 import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
 import cz.sinko.smarthome.service.dtos.user.UserDto;
 import cz.sinko.smarthome.service.dtos.user.UserListDto;

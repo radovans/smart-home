@@ -65,6 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					SecurityContextHolder.getContext().setAuthentication(authentication);
 				}
 			} catch (ResourceNotFoundException ex) {
+				//TODO: wrong token, or user
 				httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
 			}
 		}

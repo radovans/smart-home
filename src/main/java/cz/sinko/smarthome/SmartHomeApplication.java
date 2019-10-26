@@ -20,9 +20,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.zalando.logbook.BodyFilter;
+import org.zalando.logbook.HttpLogFormatter;
 import org.zalando.logbook.Logbook;
 import org.zalando.logbook.autoconfigure.LogbookAutoConfiguration;
 import org.zalando.logbook.json.JsonHttpLogFormatter;
+import org.zalando.logbook.logstash.LogstashLogbackSink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -74,7 +76,11 @@ public class SmartHomeApplication {
 
 	@Bean
 	public Logbook logbook() {
+		HttpLogFormatter formatter = new JsonHttpLogFormatter();
+		LogstashLogbackSink sink = new LogstashLogbackSink(formatter);
+
 		return Logbook.builder()
+				.sink(sink)
 				.condition(exclude(
 						requestTo("/actuator"),
 						requestTo("/actuator/*"),
