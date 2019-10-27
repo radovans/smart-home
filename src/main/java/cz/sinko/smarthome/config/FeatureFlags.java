@@ -8,24 +8,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("feature")
-public class FeatureToogles {
+public class FeatureFlags {
 
-	private final Map<String, Boolean> toggles = new HashMap<>();
+	private final Map<String, Boolean> flags = new HashMap<>();
 
-	public Map<String, Boolean> getToggles() {
-		return toggles;
+	public Map<String, Boolean> getFlags() {
+		return flags;
 	}
 
 	public boolean lightsInfoEnabled() {
-		return toggles.getOrDefault("feature.toggle.cron.lights.info", true);
+		return flags.getOrDefault("feature.toggle.cron.lights.info", true);
 	}
 
 	public boolean weatherInfoEnabled() {
-		return toggles.getOrDefault("feature.toggle.cron.weather.info", true);
+		return flags.getOrDefault("feature.toggle.cron.weather.info", true);
 	}
 
 	public boolean roomInfoEnabled() {
-		return toggles.getOrDefault("feature.toggle.cron.room.info", true);
+		return flags.getOrDefault("feature.toggle.cron.room.info", true);
 	}
 
 }
