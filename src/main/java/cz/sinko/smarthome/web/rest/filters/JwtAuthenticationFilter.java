@@ -23,9 +23,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import cz.sinko.smarthome.config.security.JwtService;
 import cz.sinko.smarthome.repository.entities.User;
 import cz.sinko.smarthome.web.rest.exceptions.ResourceNotFoundException;
+import cz.sinko.smarthome.web.rest.exceptions.SecurityException;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Order(2)
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
@@ -38,9 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException, SecurityException {
 		try {
-			setSecurityContext(httpServletRequest, httpServletResponse);
+			setSecurityContext(httpServletRequest);
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			if (authentication instanceof UsernamePasswordAuthenticationToken) {
 				MDC.put("username", authentication.getName());
@@ -52,21 +55,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 	}
 
-	private void setSecurityContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+	private void setSecurityContext(HttpServletRequest httpServletRequest) throws SecurityException{
 		String token = httpServletRequest.getHeader(tokenHeader);
-		logger.debug("auth header content: " + token);
+		log.debug("auth header content: " + token);
 		if (token != null) {
 			try {
 				User user = jwtService.parseToken(token);
 				if (user != null) {
 					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-					logger.info("authenticated user " + user.getUsername() + " setting security context");
+					log.info("authenticated user '" + user.getUsername() + "' setting security context");
 					SecurityContextHolder.getContext().setAuthentication(authentication);
 				}
 			} catch (ResourceNotFoundException ex) {
-				//TODO: wrong token, or user
-				httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+				log.warn("can not authenticate user", ex);
 			}
 		}
 	}

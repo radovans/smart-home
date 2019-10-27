@@ -22,6 +22,7 @@ import cz.sinko.smarthome.service.dtos.user.UserCreateUpdateDto;
 import cz.sinko.smarthome.service.dtos.user.UserDto;
 import cz.sinko.smarthome.service.dtos.user.UserListDto;
 import cz.sinko.smarthome.service.services.UserService;
+import cz.sinko.smarthome.web.rest.exceptions.SecurityException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -37,9 +38,10 @@ public class UserEndpoint {
 		this.userService = userService;
 	}
 
+	@LoggedInPermission
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public UserListDto getAllUsers() {
+	public UserListDto getAllUsers() throws SecurityException {
 		log.info("Message");
 		return userService.getAllUsers();
 	}
@@ -67,6 +69,13 @@ public class UserEndpoint {
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@NotNull @PathVariable("id") Long id) {
 		userService.deleteUser(id);
+	}
+
+	@LoggedInPermission
+	@GetMapping(path = "/securityException")
+	@ResponseStatus(HttpStatus.OK)
+	public void securityException() {
+		throw new SecurityException("Security exception test");
 	}
 
 }

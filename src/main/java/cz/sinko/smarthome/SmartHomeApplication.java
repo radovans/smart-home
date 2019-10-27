@@ -7,9 +7,7 @@ import static org.zalando.logbook.Conditions.exclude;
 import static org.zalando.logbook.Conditions.requestTo;
 import static org.zalando.logbook.json.JsonBodyFilters.replaceJsonStringProperty;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -19,15 +17,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.HttpLogFormatter;
 import org.zalando.logbook.Logbook;
-import org.zalando.logbook.autoconfigure.LogbookAutoConfiguration;
 import org.zalando.logbook.json.JsonHttpLogFormatter;
 import org.zalando.logbook.logstash.LogstashLogbackSink;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 import cz.sinko.smarthome.repository.daos.UserRepository;
 import cz.sinko.smarthome.repository.entities.enums.Role;
@@ -84,7 +77,7 @@ public class SmartHomeApplication {
 				.condition(exclude(
 						requestTo("/actuator"),
 						requestTo("/actuator/*"),
-						requestTo("/v2/api-doce"),
+						requestTo("/v2/api-docs"),
 						requestTo("/swagger-ui.html"),
 						requestTo("/swagger-resources"),
 						requestTo("/csrf"),
