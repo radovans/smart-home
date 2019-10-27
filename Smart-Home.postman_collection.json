@@ -1,0 +1,435 @@
+{
+	"info": {
+		"_postman_id": "eed12878-ec60-4fca-b68a-8f28352c6b61",
+		"name": "Smart-Home",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "External",
+			"item": [
+				{
+					"name": "Weather API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://api.openweathermap.org/data/2.5/weather?id=3078610&units=metric&APPID=c2e04a00278031fc5b8e8c78590e2939",
+							"protocol": "http",
+							"host": [
+								"api",
+								"openweathermap",
+								"org"
+							],
+							"path": [
+								"data",
+								"2.5",
+								"weather"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "3078610"
+								},
+								{
+									"key": "units",
+									"value": "metric"
+								},
+								{
+									"key": "APPID",
+									"value": "c2e04a00278031fc5b8e8c78590e2939"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hue API authenticate oauth",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.meethue.com/oauth2/auth?clientid=A8AcWBwuZAb6wbxQGCuFdDA3MCGUKiqZ&appid=smart_home&response_type=code",
+							"protocol": "https",
+							"host": [
+								"api",
+								"meethue",
+								"com"
+							],
+							"path": [
+								"oauth2",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "clientid",
+									"value": "A8AcWBwuZAb6wbxQGCuFdDA3MCGUKiqZ"
+								},
+								{
+									"key": "appid",
+									"value": "smart_home"
+								},
+								{
+									"key": "deviceid",
+									"value": "<deviceid>",
+									"disabled": true
+								},
+								{
+									"key": "devicename",
+									"value": "<devicename>",
+									"disabled": true
+								},
+								{
+									"key": "state",
+									"value": "<state>",
+									"disabled": true
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ESP",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "192.168.0.200",
+							"host": [
+								"192",
+								"168",
+								"0",
+								"200"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Utils",
+			"item": [
+				{
+					"name": "Swagger doc",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{env}}:{{port}}/v2/api-docs",
+							"protocol": "http",
+							"host": [
+								"{{env}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v2",
+								"api-docs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actuator",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{env}}:{{port}}/actuator",
+							"protocol": "http",
+							"host": [
+								"{{env}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"actuator"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{env}}:{{port}}/actuator/health",
+							"protocol": "http",
+							"host": [
+								"{{env}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Feature toggles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://{{env}}:{{port}}/actuator/feature-toggles",
+							"protocol": "http",
+							"host": [
+								"{{env}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"actuator",
+								"feature-toggles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Prometheus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{env}}:{{port}}/actuator/prometheus",
+							"protocol": "http",
+							"host": [
+								"{{env}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"actuator",
+								"prometheus"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "HUE Api",
+			"item": [
+				{
+					"name": "All info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.0.241/api/wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"0",
+								"241"
+							],
+							"path": [
+								"api",
+								"wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all lights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.0.241/api/wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS/lights",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"0",
+								"241"
+							],
+							"path": [
+								"api",
+								"wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS",
+								"lights"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capabilities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.0.241/api/wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS/capabilities",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"0",
+								"241"
+							],
+							"path": [
+								"api",
+								"wpLE-C3WbBRVSXnWWn4oZQAyfZWB9TEqB-vt3MUS",
+								"capabilities"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "{{apikey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{env}}:{{port}}/users",
+					"protocol": "http",
+					"host": [
+						"{{env}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lighting Info",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "66225a00-8049-438f-88a3-fc5e1121add3",
+						"exec": [
+							"const moment = require('moment');\r",
+							"pm.globals.set(\"date\", moment().format(\"YYYY-MM-DD\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{env}}:{{port}}/lighting/lightingInfo?date={{date}}",
+					"protocol": "http",
+					"host": [
+						"{{env}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"lighting",
+						"lightingInfo"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "{{date}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3a5feb1b-bb8d-425e-9da7-59d66c5a2747",
+						"exec": [
+							"// Parsing the response returned by the request.",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Extracting the token from the response and setting it as a global variable.",
+							"pm.globals.set(\"apikey\", jsonData['loginToken']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"admin\",\n\t\"password\":\"admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{env}}:{{port}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{env}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
